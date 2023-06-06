@@ -1,0 +1,19 @@
+/* @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap'); */
+
+* {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+body, html {
+    height: 100%;
+    width: 100%;
+    background: black;
+    overflow: hidden;
+}
+
+canvas {
+    background: url(../images/background/background.png);
+    background-repeat: repeat;
+}
