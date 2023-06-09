@@ -18,215 +18,9 @@ backgroundMusicAudio.loop = true;
 const scene = {
     active: false
 };
-class Player {
-    constructor(x, y, radius, color) {
-        this.x = x;
-        this.y = y;
-        this.radius = radius;
-        this.color = color;
-        this.velocity = {
-            x: 0,
-            y: 0
-        };
-        this.friction = 0.99;
-        this.powerUp = '';
-    }
-    draw() {
-        c.beginPath();
-        c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-        c.fillStyle = this.color;
-        c.fill();
-    }
-    update() {
-        this.draw();
-        this.velocity.x *= this.friction;
-        this.velocity.y *= this.friction;
-        if (this.x - this.radius + this.velocity.x > 0 &&
-            this.x + this.radius + this.velocity.x < canvas.width) {
-            this.x = this.x + this.velocity.x;
-        }
-        else {
-            this.velocity.x = 0;
-        }
-        if (this.y - this.radius + this.velocity.y > 0 &&
-            this.y + this.radius + this.velocity.y < canvas.height) {
-            this.y = this.y + this.velocity.y;
-        }
-        else {
-            this.velocity.y = 0;
-        }
-    }
-    shoot(mouse, color = 'white') {
-        const angle = Math.atan2(mouse.y - this.y, mouse.x - this.x);
-        const velocity = {
-            x: Math.cos(angle) * 5,
-            y: Math.sin(angle) * 5
-        };
-        projectiles.push(new Projectile(this.x, this.y, 5, color, velocity));
-        shootAudio.play();
-    }
-}
-class Projectile {
-    constructor(x, y, radius, color, velocity) {
-        this.x = x;
-        this.y = y;
-        this.radius = radius;
-        this.color = color;
-        this.velocity = velocity;
-    }
-    draw() {
-        c.beginPath();
-        c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-        c.fillStyle = this.color;
-        c.fill();
-    }
-    update() {
-        this.draw();
-        this.x = this.x + this.velocity.x;
-        this.y = this.y + this.velocity.y;
-    }
-}
 const powerUpImg = new Image();
 powerUpImg.src = './images/lightning.png';
-class PowerUp {
-    constructor(x, y, velocity) {
-        this.x = x;
-        this.y = y;
-        this.velocity = velocity;
-        this.width = 14;
-        this.height = 18;
-        this.radians = 0;
-    }
-    draw() {
-        c.save();
-        c.translate(this.x + this.width / 2, this.y + this.height / 2);
-        c.rotate(this.radians);
-        c.translate(-this.x - this.width / 2, -this.y - this.height / 2);
-        c.drawImage(powerUpImg, this.x, this.y, 14, 18);
-        c.restore();
-    }
-    update() {
-        this.radians += 0.002;
-        this.draw();
-        this.x = this.x + this.velocity.x;
-        this.y = this.y + this.velocity.y;
-    }
-}
-class Enemy {
-    constructor(x, y, radius, color, velocity) {
-        this.x = x;
-        this.y = y;
-        this.radius = radius;
-        this.color = color;
-        this.velocity = velocity;
-        this.type = 'linear';
-        this.center = {
-            x,
-            y
-        };
-        this.radians = 0;
-        if (Math.random() < 0.25) {
-            this.type = 'homing';
-            if (Math.random() < 0.5) {
-                this.type = 'spinning';
-                if (Math.random() < 0.75) {
-                    this.type = 'homingSpinning';
-                }
-            }
-        }
-    }
-    draw() {
-        c.beginPath();
-        c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-        c.fillStyle = this.color;
-        c.fill();
-    }
-    update() {
-        this.draw();
-        if (this.type === 'linear') {
-            this.x = this.x + this.velocity.x;
-            this.y = this.y + this.velocity.y;
-        }
-        else if (this.type === 'homing') {
-            const angle = Math.atan2(player.y - this.y, player.x - this.x);
-            this.velocity = {
-                x: Math.cos(angle),
-                y: Math.sin(angle)
-            };
-            this.x = this.x + this.velocity.x;
-            this.y = this.y + this.velocity.y;
-        }
-        else if (this.type === 'spinning') {
-            this.radians += 0.05;
-            this.center.x += this.velocity.x;
-            this.center.y += this.velocity.y;
-            this.x = this.center.x + Math.cos(this.radians) * 100;
-            this.y = this.center.y + Math.sin(this.radians) * 100;
-        }
-        else if (this.type === 'homingSpinning') {
-            const angle = Math.atan2(player.y - this.y, player.x - this.x);
-            this.velocity = {
-                x: Math.cos(angle),
-                y: Math.sin(angle)
-            };
-            this.radians += 0.05;
-            this.center.x += this.velocity.x;
-            this.center.y += this.velocity.y;
-            this.x = this.center.x + Math.cos(this.radians) * 100;
-            this.y = this.center.y + Math.sin(this.radians) * 100;
-        }
-    }
-}
 const friction = 0.99;
-class Particle {
-    constructor(x, y, radius, color, velocity) {
-        this.x = x;
-        this.y = y;
-        this.radius = radius;
-        this.color = color;
-        this.velocity = velocity;
-        this.alpha = 1;
-    }
-    draw() {
-        c.save();
-        c.globalAlpha = this.alpha;
-        c.beginPath();
-        c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-        c.fillStyle = this.color;
-        c.fill();
-        c.restore();
-    }
-    update() {
-        this.draw();
-        this.velocity.x *= friction;
-        this.velocity.y *= friction;
-        this.x = this.x + this.velocity.x;
-        this.y = this.y + this.velocity.y;
-        this.alpha -= 0.01;
-    }
-}
-class BackgroundParticle {
-    constructor(x, y, radius, color) {
-        this.x = x;
-        this.y = y;
-        this.radius = radius;
-        this.color = color;
-        this.alpha = 0.05;
-        this.initialAlpha = this.alpha;
-    }
-    draw() {
-        c.save();
-        c.globalAlpha = this.alpha;
-        c.beginPath();
-        c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-        c.fillStyle = this.color;
-        c.fill();
-        c.restore();
-    }
-    update() {
-        this.draw();
-    }
-}
 let player;
 let powerUps = [];
 let projectiles = [];
@@ -236,7 +30,7 @@ let backgroundParticles = [];
 function init() {
     const x = canvas.width / 2;
     const y = canvas.height / 2;
-    player = new Player(x, y, 10, 'white');
+    player = new Player({ x, y }, 10, 'white');
     powerUps = [];
     projectiles = [];
     enemies = [];
@@ -266,7 +60,7 @@ function spawnEnemies() {
         x: Math.cos(angle),
         y: Math.sin(angle)
     };
-    enemies.push(new Enemy(x, y, radius, color, velocity));
+    enemies.push(new Enemy({ x, y }, radius, color, velocity));
 }
 function spawnPowerUps() {
     let x;
@@ -284,7 +78,7 @@ function spawnPowerUps() {
         x: Math.cos(angle),
         y: Math.sin(angle)
     };
-    powerUps.push(new PowerUp(x, y, velocity));
+    powerUps.push(new PowerUp({ x, y }, velocity));
 }
 function createScoreLabel(projectile, score) {
     const scoreLabel = document.createElement('label');
@@ -292,8 +86,8 @@ function createScoreLabel(projectile, score) {
     scoreLabel.style.position = 'absolute';
     scoreLabel.style.color = 'white';
     scoreLabel.style.userSelect = 'none';
-    scoreLabel.style.left = projectile.x.toString();
-    scoreLabel.style.top = projectile.y.toString();
+    scoreLabel.style.left = projectile.position.x.toString();
+    scoreLabel.style.top = projectile.position.y.toString();
     document.body.appendChild(scoreLabel);
     gsap.to(scoreLabel, {
         opacity: 0,
@@ -317,7 +111,7 @@ function animate() {
     if (frame % 300 === 0)
         spawnPowerUps();
     backgroundParticles.forEach((backgroundParticle) => {
-        const dist = Math.hypot(player.x - backgroundParticle.x, player.y - backgroundParticle.y);
+        const dist = Math.hypot(player.position.x - backgroundParticle.position.x, player.position.y - backgroundParticle.position.y);
         const hideRadius = 100;
         if (dist < hideRadius) {
             if (dist < 70) {
@@ -352,7 +146,7 @@ function animate() {
         }
     }
     powerUps.forEach((powerUp, index) => {
-        const dist = Math.hypot(player.x - powerUp.x, player.y - powerUp.y);
+        const dist = Math.hypot(player.position.x - powerUp.position.x, player.position.y - powerUp.position.y);
         if (dist - player.radius - powerUp.width / 2 < 1) {
             player.color = '#FFF500';
             player.powerUp = 'Automatic';
@@ -369,10 +163,10 @@ function animate() {
     });
     projectiles.forEach((projectile, index) => {
         projectile.update();
-        if (projectile.x + projectile.radius < 0 ||
-            projectile.x - projectile.radius > canvas.width ||
-            projectile.y + projectile.radius < 0 ||
-            projectile.y - projectile.radius > canvas.height) {
+        if (projectile.position.x + projectile.radius < 0 ||
+            projectile.position.x - projectile.radius > canvas.width ||
+            projectile.position.y + projectile.radius < 0 ||
+            projectile.position.y - projectile.radius > canvas.height) {
             setTimeout(() => {
                 projectiles.splice(index, 1);
             }, 0);
@@ -380,7 +174,7 @@ function animate() {
     });
     enemies.slice().forEach((enemy, index) => {
         enemy.update();
-        const dist = Math.hypot(player.x - enemy.x, player.y - enemy.y);
+        const dist = Math.hypot(player.position.x - enemy.position.x, player.position.y - enemy.position.y);
         if (dist - enemy.radius - player.radius < 1) {
             cancelAnimationFrame(animationId);
             modalEl.style.display = 'flex';
@@ -395,10 +189,13 @@ function animate() {
             });
         }
         projectiles.forEach((projectile, projectileIndex) => {
-            const dist = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y);
+            const dist = Math.hypot(projectile.position.x - enemy.position.x, projectile.position.y - enemy.position.y);
             if (dist - enemy.radius - projectile.radius < 0.03) {
                 for (let i = 0; i < enemy.radius * 2; i++) {
-                    particles.push(new Particle(projectile.x, projectile.y, Math.random() * 2, enemy.color, {
+                    particles.push(new Particle({
+                        x: projectile.position.x,
+                        y: projectile.position.y
+                    }, Math.random() * 2, enemy.color, {
                         x: (Math.random() - 0.5) * (Math.random() * 6),
                         y: (Math.random() - 0.5) * (Math.random() * 6)
                     }));
@@ -534,5 +331,188 @@ addEventListener('keydown', ({ keyCode }) => {
             player.velocity.y -= 1;
             break;
     }
-    console.log(keyCode);
 });
+class BackgroundParticle {
+    constructor(x, y, radius, color) {
+        this.position = { x: x, y: y };
+        this.radius = radius;
+        this.color = color;
+        this.alpha = 0.05;
+        this.initialAlpha = this.alpha;
+    }
+    draw() {
+        c.save();
+        c.globalAlpha = this.alpha;
+        c.beginPath();
+        c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2, false);
+        c.fillStyle = this.color;
+        c.fill();
+        c.restore();
+    }
+    update() {
+        this.draw();
+    }
+}
+class Enemy {
+    constructor(position, radius, color, velocity) {
+        this.position = position;
+        this.radius = radius;
+        this.color = color;
+        this.velocity = velocity;
+        this.type = 'linear';
+        this.center = { x: this.position.x, y: this.position.y };
+        this.radians = 0;
+        if (Math.random() < 0.25) {
+            this.type = 'homing';
+            if (Math.random() < 0.5) {
+                this.type = 'spinning';
+                if (Math.random() < 0.75) {
+                    this.type = 'homingSpinning';
+                }
+            }
+        }
+    }
+    draw() {
+        c.beginPath();
+        c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2, false);
+        c.fillStyle = this.color;
+        c.fill();
+    }
+    update() {
+        this.draw();
+        if (this.type === 'linear') {
+            this.position.x = this.position.x + this.velocity.x;
+            this.position.y = this.position.y + this.velocity.y;
+        }
+        else if (this.type === 'homing') {
+            const angle = Math.atan2(player.position.y - this.position.y, player.position.x - this.position.x);
+            this.velocity = { x: Math.cos(angle), y: Math.sin(angle) };
+            this.position.x = this.position.x + this.velocity.x;
+            this.position.y = this.position.y + this.velocity.y;
+        }
+        else if (this.type === 'spinning') {
+            this.radians += 0.05;
+            this.center.x += this.velocity.x;
+            this.center.y += this.velocity.y;
+            this.position.x = this.center.x + Math.cos(this.radians) * 100;
+            this.position.y = this.center.y + Math.sin(this.radians) * 100;
+        }
+        else if (this.type === 'homingSpinning') {
+            const angle = Math.atan2(player.position.y - this.position.y, player.position.x - this.position.x);
+            this.velocity = { x: Math.cos(angle), y: Math.sin(angle) };
+            this.radians += 0.05;
+            this.center.x += this.velocity.x;
+            this.center.y += this.velocity.y;
+            this.position.x = this.center.x + Math.cos(this.radians) * 100;
+            this.position.y = this.center.y + Math.sin(this.radians) * 100;
+        }
+    }
+}
+class Particle {
+    constructor(position, radius, color, velocity) {
+        this.position = position;
+        this.radius = radius;
+        this.color = color;
+        this.velocity = velocity;
+        this.alpha = 1;
+    }
+    draw() {
+        c.save();
+        c.globalAlpha = this.alpha;
+        c.beginPath();
+        c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2, false);
+        c.fillStyle = this.color;
+        c.fill();
+        c.restore();
+    }
+    update() {
+        this.draw();
+        this.velocity.x *= friction;
+        this.velocity.y *= friction;
+        this.position.x = this.position.x + this.velocity.x;
+        this.position.y = this.position.y + this.velocity.y;
+        this.alpha -= 0.01;
+    }
+}
+class Player {
+    constructor(position, radius, color) {
+        this.position = position;
+        this.radius = radius;
+        this.color = color;
+        this.velocity = { x: 0, y: 0 };
+        this.friction = 0.99;
+        this.powerUp = '';
+    }
+    draw() {
+        c.beginPath();
+        c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2, false);
+        c.fillStyle = this.color;
+        c.fill();
+    }
+    update() {
+        this.draw();
+        this.velocity.x *= this.friction;
+        this.velocity.y *= this.friction;
+        if (this.position.x - this.radius + this.velocity.x > 0 && this.position.x + this.radius + this.velocity.x < canvas.width) {
+            this.position.x = this.position.x + this.velocity.x;
+        }
+        else {
+            this.velocity.x = 0;
+        }
+        if (this.position.y - this.radius + this.velocity.y > 0 && this.position.y + this.radius + this.velocity.y < canvas.height) {
+            this.position.y = this.position.y + this.velocity.y;
+        }
+        else {
+            this.velocity.y = 0;
+        }
+    }
+    shoot(mouse, color = 'white') {
+        const angle = Math.atan2(mouse.y - this.position.y, mouse.x - this.position.x);
+        const velocity = { x: Math.cos(angle) * 5, y: Math.sin(angle) * 5 };
+        const position = { x: this.position.x, y: this.position.y };
+        projectiles.push(new Projectile(position, 5, color, velocity));
+        shootAudio.play();
+    }
+}
+class PowerUp {
+    constructor(position, velocity) {
+        this.position = position;
+        this.velocity = velocity;
+        this.width = 14;
+        this.height = 18;
+        this.radians = 0;
+    }
+    draw() {
+        c.save();
+        c.translate(this.position.x + this.width / 2, this.position.y + this.height / 2);
+        c.rotate(this.radians);
+        c.translate(-this.position.x - this.width / 2, -this.position.y - this.height / 2);
+        c.drawImage(powerUpImg, this.position.x, this.position.y, 14, 18);
+        c.restore();
+    }
+    update() {
+        this.radians += 0.002;
+        this.draw();
+        this.position.x = this.position.x + this.velocity.x;
+        this.position.y = this.position.y + this.velocity.y;
+    }
+}
+class Projectile {
+    constructor(position, radius, color, velocity) {
+        this.position = position;
+        this.radius = radius;
+        this.color = color;
+        this.velocity = velocity;
+    }
+    draw() {
+        c.beginPath();
+        c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2, false);
+        c.fillStyle = this.color;
+        c.fill();
+    }
+    update() {
+        this.draw();
+        this.position.x = this.position.x + this.velocity.x;
+        this.position.y = this.position.y + this.velocity.y;
+    }
+}
