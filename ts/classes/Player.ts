@@ -17,10 +17,10 @@ class Player {
     }
 
     draw(): void {
-        c!.beginPath();
-        c!.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2, false);
-        c!.fillStyle = this.color;
-        c!.fill();
+        ctx.beginPath();
+        ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2, false);
+        ctx.fillStyle = this.color;
+        ctx.fill();
     }
 
     update(): void {
@@ -43,8 +43,8 @@ class Player {
         const angle = Math.atan2(mouse.y - this.position.y, mouse.x - this.position.x);
         const velocity = { x: Math.cos(angle) * 5, y: Math.sin(angle) * 5 };
         const position = { x: this.position.x, y: this.position.y };
-        projectiles.push(new Projectile(position, 5, color, velocity));
-        shootAudio.play();
+        listOfProjectiles.push(new Projectile(position, 5, color, velocity));
+        //shootAudio.play();
     }
 
 }

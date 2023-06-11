@@ -1,11 +1,13 @@
-const canvas = document.querySelector('canvas')
-const c = canvas!.getContext('2d')
+/// <reference path="references.ts"/>
 
-canvas!.width = innerWidth
-canvas!.height = innerHeight
+const canvas: HTMLCanvasElement = document.querySelector("canvas")!;
+const ctx: CanvasRenderingContext2D = canvas.getContext("2d")!;
 
-const scoreEl = document.querySelector('#scoreEl')
-const startGameBtn = document.querySelector('#startGameBtn')
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+/*const scoreEl = document.querySelector('#scoreEl');
+const startGameBtn = document.querySelector('#startGameBtn');
 const modalEl = document.querySelector('#modalEl') as HTMLElement
 const bigScoreEl = document.querySelector('#bigScoreEl')
 
@@ -26,32 +28,32 @@ const powerUpImg = new Image()
 powerUpImg.src = './images/lightning.png'
 
 const friction = 0.99
+*/
+let player: Player;
+//let powerUps: PowerUp[] = []
+let listOfProjectiles: Projectile[];
+//let enemies: Enemy[] = []
+//let particles: Particle[] = []
+//let backgroundParticles: BackgroundParticle[] = []
 
-let player: Player
-let powerUps: PowerUp[] = []
-let projectiles: Projectile[] = []
-let enemies: Enemy[] = []
-let particles: Particle[] = []
-let backgroundParticles: BackgroundParticle[] = []
+function init(): void {
+    const x: number = canvas.width / 2;
+    const y: number = canvas.height / 2;
+    player = new Player({x, y}, 10, "white");
+    //powerUps = []
+    listOfProjectiles = [];
+    //enemies = []
+    //particles = []
+    //backgroundParticles = []
 
-function init() {
-    const x = canvas!.width / 2
-    const y = canvas!.height / 2
-    player = new Player({x, y}, 10, 'white')
-    powerUps = []
-    projectiles = []
-    enemies = []
-    particles = []
-    backgroundParticles = []
-
-    for (let x = 0; x < canvas!.width; x += 30) {
+    /*for (let x = 0; x < canvas!.width; x += 30) {
         for (let y = 0; y < canvas!.height; y += 30) {
             backgroundParticles.push(new BackgroundParticle(x, y, 3, 'blue'))
         }
-    }
+    }*/
 }
 
-function spawnEnemies() {
+/*function spawnEnemies() {
     const radius = Math.random() * (30 - 4) + 4
 
     let x
@@ -75,9 +77,9 @@ function spawnEnemies() {
     }
 
     enemies.push(new Enemy({x, y}, radius, color, velocity))
-}
+}*/
 
-function spawnPowerUps() {
+/*function spawnPowerUps() {
     let x
     let y
 
@@ -97,9 +99,9 @@ function spawnPowerUps() {
     }
 
     powerUps.push(new PowerUp({x, y}, velocity))
-}
+}*/
 
-function createScoreLabel(projectile: Projectile, score: string) {
+/*function createScoreLabel(projectile: Projectile, score: string) {
     const scoreLabel = document.createElement('label')
     scoreLabel.innerHTML = score
     scoreLabel.style.position = 'absolute'
@@ -117,21 +119,22 @@ function createScoreLabel(projectile: Projectile, score: string) {
             scoreLabel.parentNode!.removeChild(scoreLabel)
         }
     })
-}
+}*/
 
-let animationId: number
-let score = 0
-let frame = 0
-function animate() {
-    animationId = requestAnimationFrame(animate)
-    frame++
-    c!.fillStyle = 'rgba(0, 0, 0, 0.1)'
-    c!.fillRect(0, 0, canvas!.width, canvas!.height)
+let animationId: number;
+//let score = 0
+let frame: number = 0;
+function animate(): void {
+    //animationId = window.requestAnimationFrame(animate);
+    frame++;
+    //ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'
+    //ctx.fillRect(0, 0, canvas!.width, canvas!.height)
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if (frame % 70 === 0) spawnEnemies()
-    if (frame % 300 === 0) spawnPowerUps()
+    //if (frame % 70 === 0) spawnEnemies()
+    //if (frame % 300 === 0) spawnPowerUps()
 
-    backgroundParticles.forEach((backgroundParticle) => {
+    /*backgroundParticles.forEach((backgroundParticle) => {
         const dist = Math.hypot(
             player.position.x - backgroundParticle.position.x,
             player.position.y - backgroundParticle.position.y
@@ -157,24 +160,25 @@ function animate() {
         }
 
         backgroundParticle.update()
-    })
+    })*/
 
-    player.update()
-    particles.forEach((particle, index) => {
+    player.update();
+    
+    /*particles.forEach((particle, index) => {
         if (particle.alpha <= 0) {
             particles.splice(index, 1)
         } else {
             particle.update()
         }
-    })
+    })*/
 
-    if (player.powerUp === 'Automatic' && mouse.down) {
+    /*if (player.powerUp === 'Automatic' && mouse.down) {
         if (frame % 4 === 0) {
             player.shoot(mouse, '#FFF500')
         }
-    }
+    }*/
 
-    powerUps.forEach((powerUp, index) => {
+    /*powerUps.forEach((powerUp, index) => {
         const dist = Math.hypot(player.position.x - powerUp.position.x, player.position.y - powerUp.position.y)
 
         // obtain power up
@@ -193,11 +197,10 @@ function animate() {
         } else {
             powerUp.update()
         }
-    })
+    })*/
 
-    projectiles.forEach((projectile, index) => {
-        projectile.update()
-
+    listOfProjectiles.forEach((projectile, index) => {
+        projectile.update();
         // remove from edges of screen
         if (
             projectile.position.x + projectile.radius < 0 ||
@@ -206,12 +209,12 @@ function animate() {
             projectile.position.y - projectile.radius > canvas!.height
         ) {
             setTimeout(() => {
-                projectiles.splice(index, 1)
+                listOfProjectiles.splice(index, 1)
             }, 0)
         }
     })
 
-    enemies.slice().forEach((enemy, index) => {
+    /*enemies.slice().forEach((enemy, index) => {
         enemy.update()
 
         const dist = Math.hypot(player.position.x - enemy.position.x, player.position.y - enemy.position.y)
@@ -309,35 +312,34 @@ function animate() {
                 }
             }
         })
-    })
+    })*/
+    animationId = window.requestAnimationFrame(animate);
 }
 
 const mouse = {
     down: false,
     x: 0,
     y: 0
-}
+};
 
-addEventListener('mousedown', ({ clientX, clientY }) => {
-    mouse.x = clientX
-    mouse.y = clientY
+addEventListener("mousedown", ({ clientX, clientY }) => {
+    mouse.x = clientX;
+    mouse.y = clientY;
+    mouse.down = true;
+});
 
-    mouse.down = true
-})
+addEventListener("mousemove", ({ clientX, clientY }) => {
+    mouse.x = clientX;
+    mouse.y = clientY;
+});
 
-addEventListener('mousemove', ({ clientX, clientY }) => {
-    mouse.x = clientX
-    mouse.y = clientY
-})
+addEventListener("mouseup", () => {
+    mouse.down = false;
+});
 
-addEventListener('mouseup', () => {
-    mouse.down = false
-})
-
-addEventListener('touchstart', (event) => {
+/*addEventListener('touchstart', (event) => {
     mouse.x = event.touches[0]!.clientX
     mouse.y = event.touches[0]!.clientY
-
     mouse.down = true
 })
 
@@ -348,24 +350,27 @@ addEventListener('touchmove', (event) => {
 
 addEventListener('touchend', () => {
     mouse.down = false
-})
+})*/
 
-addEventListener('click', ({ clientX, clientY }) => {
+/*addEventListener("click", ({ clientX, clientY }) => {
     if (scene.active && player.powerUp !== 'Automatic') {
         mouse.x = clientX
         mouse.y = clientY
         player.shoot(mouse)
     }
-})
+});*/
 
-addEventListener('resize', () => {
-    canvas!.width = innerWidth
-    canvas!.height = innerHeight
+addEventListener("click", () => {
+    player.shoot(mouse);
+});
 
-    init()
-})
+addEventListener("resize", () => {
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+    init();
+});
 
-startGameBtn!.addEventListener('click', () => {
+/*startGameBtn!.addEventListener('click', () => {
     init()
     animate()
     startGameAudio.play()
@@ -385,9 +390,9 @@ startGameBtn!.addEventListener('click', () => {
             modalEl.style.display = 'none'
         }
     })
-})
+})*/
 
-addEventListener('keydown', ({ keyCode }) => {
+addEventListener("keydown", ({ keyCode }) => {
     if (keyCode === 87) {
         player.velocity.y -= 1
     } else if (keyCode === 65) {
@@ -417,4 +422,7 @@ addEventListener('keydown', ({ keyCode }) => {
     }
 
     //console.log(keyCode)
-})
+});
+
+init();
+animate();
