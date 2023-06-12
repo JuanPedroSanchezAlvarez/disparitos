@@ -1,42 +1,45 @@
 class Player {
 
     position: { x: number; y: number };
-    radius: number;
-    color: string;
-    velocity: { x: number; y: number };
-    friction: number;
-    powerUp: string;
+    movingUp: boolean;
+    movingLeft: boolean;
+    movingDown: boolean;
+    movingRight: boolean;
 
-    constructor(position: { x: number; y: number }, radius: number, color: string) {
+    constructor(position: { x: number; y: number }) {
         this.position = position;
-        this.radius = radius;
-        this.color = color;
-        this.velocity = { x: 0, y: 0 };
-        this.friction = 0.99;
-        this.powerUp = '';
+        this.movingUp = false;
+        this.movingLeft = false;
+        this.movingDown = false;
+        this.movingRight = false;
     }
 
     draw(): void {
         ctx.beginPath();
-        ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2, false);
-        ctx.fillStyle = this.color;
+        ctx.fillStyle = PLAYER_COLOR;
+        ctx.arc(this.position.x, this.position.y, PLAYER_RADIUS, 0, Math.PI * 2, false);
         ctx.fill();
+        ctx.closePath();
     }
 
     update(): void {
+        if (this.movingUp) { player.position.y -= PLAYER_SPEED; }
+        if (this.movingLeft) { player.position.x -= PLAYER_SPEED; }
+        if (this.movingDown) { player.position.y += PLAYER_SPEED; }
+        if (this.movingRight) { player.position.x += PLAYER_SPEED; }
+
+        if (this.position.x - PLAYER_RADIUS < 0) {
+            this.position.x = 0 + PLAYER_RADIUS;
+        } else if (this.position.x + PLAYER_RADIUS > canvas.width) {
+            this.position.x = canvas.width - PLAYER_RADIUS;
+        }
+        if (this.position.y - PLAYER_RADIUS < 0) {
+            this.position.y = 0 + PLAYER_RADIUS;
+        } else if (this.position.y + PLAYER_RADIUS > canvas.height) {
+            this.position.y = canvas.height - PLAYER_RADIUS;
+        }
+
         this.draw();
-        this.velocity.x *= this.friction;
-        this.velocity.y *= this.friction;
-        if (this.position.x - this.radius + this.velocity.x > 0 && this.position.x + this.radius + this.velocity.x < canvas!.width) {
-            this.position.x = this.position.x + this.velocity.x;
-        } else {
-            this.velocity.x = 0;
-        }
-        if (this.position.y - this.radius + this.velocity.y > 0 && this.position.y + this.radius + this.velocity.y < canvas!.height) {
-            this.position.y = this.position.y + this.velocity.y;
-        } else {
-            this.velocity.y = 0;
-        }
     }
 
     shoot(mouse: { y: number; x: number }, color = 'white'): void {

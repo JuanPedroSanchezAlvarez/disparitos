@@ -2,9 +2,16 @@
 
 const canvas: HTMLCanvasElement = document.querySelector("canvas")!;
 const ctx: CanvasRenderingContext2D = canvas.getContext("2d")!;
-
-canvas.width = innerWidth;
-canvas.height = innerHeight;
+// Tamaño de la resolución del juego.
+canvas.width = WINDOW_WIDTH;
+canvas.height = WINDOW_HEIGHT;
+// Escalamos la resolución al tamaño de la pantalla del dispositivo.
+canvas.style.width = "100%";
+canvas.style.height = "100vh";
+// Cargamos la fuente de letra del juego y centramos los textos.
+ctx.font = "normal " + FONT_SIZE_STRING + " Black Ops One, cursive";
+ctx.textAlign = "center";
+ctx.textBaseline = "middle";
 
 /*const scoreEl = document.querySelector('#scoreEl');
 const startGameBtn = document.querySelector('#startGameBtn');
@@ -39,7 +46,7 @@ let listOfProjectiles: Projectile[];
 function init(): void {
     const x: number = canvas.width / 2;
     const y: number = canvas.height / 2;
-    player = new Player({x, y}, 10, "white");
+    player = new Player({x, y});
     //powerUps = []
     listOfProjectiles = [];
     //enemies = []
@@ -392,36 +399,18 @@ addEventListener("resize", () => {
     })
 })*/
 
-addEventListener("keydown", ({ keyCode }) => {
-    if (keyCode === 87) {
-        player.velocity.y -= 1
-    } else if (keyCode === 65) {
-        player.velocity.x -= 1
-    } else if (keyCode === 83) {
-        player.velocity.y += 1
-    } else if (keyCode === 68) {
-        player.velocity.x += 1
-    }
+addEventListener("keydown", ({ key }) => {
+    if (key === "w") { player.movingUp = true; }
+    if (key === "a") { player.movingLeft = true; }
+    if (key === "s") { player.movingDown = true; }
+    if (key === "d") { player.movingRight = true; }
+});
 
-    switch (keyCode) {
-        case 37:
-            player.velocity.x -= 1
-            break
-
-        case 40:
-            player.velocity.y += 1
-            break
-
-        case 39:
-            player.velocity.x += 1
-            break
-
-        case 38:
-            player.velocity.y -= 1
-            break
-    }
-
-    //console.log(keyCode)
+addEventListener("keyup", ({ key }) => {
+    if (key === "w") { player.movingUp = false; }
+    if (key === "a") { player.movingLeft = false; }
+    if (key === "s") { player.movingDown = false; }
+    if (key === "d") { player.movingRight = false; }
 });
 
 init();

@@ -1,35 +1,82 @@
 "use strict";
+const WINDOW_WIDTH = 1920;
+const WINDOW_HEIGHT = 1080;
+const FONT_SIZE_STRING = "20px";
+const FONT_SIZE_NUMBER = 20;
+const PLAYER_RADIUS = 16;
+const PLAYER_COLOR = "white";
+const PLAYER_SPEED = 3;
+class Position {
+    constructor(x = 0, y = 0) {
+        this.x = x;
+        this.y = y;
+    }
+}
+class Size {
+    constructor(width = 0, height = 0) {
+        this.width = width;
+        this.height = height;
+    }
+}
+class Circle {
+    constructor(positionX = 0, positionY = 0, radiusLength = 0) {
+        this.position = new Position(positionX, positionY);
+        this.radius = radiusLength;
+    }
+}
+class Rectangle {
+    constructor(positionX = 0, positionY = 0, width = 0, height = 0) {
+        this.position = new Position(positionX, positionY);
+        this.size = new Size(width, height);
+    }
+}
+class Mouse {
+    constructor() {
+        this.realPosition = new Position();
+        this.scaledPosition = new Position();
+    }
+}
 class Player {
-    constructor(position, radius, color) {
+    constructor(position) {
         this.position = position;
-        this.radius = radius;
-        this.color = color;
-        this.velocity = { x: 0, y: 0 };
-        this.friction = 0.99;
-        this.powerUp = '';
+        this.movingUp = false;
+        this.movingLeft = false;
+        this.movingDown = false;
+        this.movingRight = false;
     }
     draw() {
         ctx.beginPath();
-        ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2, false);
-        ctx.fillStyle = this.color;
+        ctx.fillStyle = PLAYER_COLOR;
+        ctx.arc(this.position.x, this.position.y, PLAYER_RADIUS, 0, Math.PI * 2, false);
         ctx.fill();
+        ctx.closePath();
     }
     update() {
+        if (this.movingUp) {
+            player.position.y -= PLAYER_SPEED;
+        }
+        if (this.movingLeft) {
+            player.position.x -= PLAYER_SPEED;
+        }
+        if (this.movingDown) {
+            player.position.y += PLAYER_SPEED;
+        }
+        if (this.movingRight) {
+            player.position.x += PLAYER_SPEED;
+        }
+        if (this.position.x - PLAYER_RADIUS < 0) {
+            this.position.x = 0 + PLAYER_RADIUS;
+        }
+        else if (this.position.x + PLAYER_RADIUS > canvas.width) {
+            this.position.x = canvas.width - PLAYER_RADIUS;
+        }
+        if (this.position.y - PLAYER_RADIUS < 0) {
+            this.position.y = 0 + PLAYER_RADIUS;
+        }
+        else if (this.position.y + PLAYER_RADIUS > canvas.height) {
+            this.position.y = canvas.height - PLAYER_RADIUS;
+        }
         this.draw();
-        this.velocity.x *= this.friction;
-        this.velocity.y *= this.friction;
-        if (this.position.x - this.radius + this.velocity.x > 0 && this.position.x + this.radius + this.velocity.x < canvas.width) {
-            this.position.x = this.position.x + this.velocity.x;
-        }
-        else {
-            this.velocity.x = 0;
-        }
-        if (this.position.y - this.radius + this.velocity.y > 0 && this.position.y + this.radius + this.velocity.y < canvas.height) {
-            this.position.y = this.position.y + this.velocity.y;
-        }
-        else {
-            this.velocity.y = 0;
-        }
     }
     shoot(mouse, color = 'white') {
         const angle = Math.atan2(mouse.y - this.position.y, mouse.x - this.position.x);
@@ -57,16 +104,68 @@ class Projectile {
         this.position.y = this.position.y + this.velocity.y;
     }
 }
+function getCirclesDistance(circle1, circle2) {
+    return Math.hypot(circle1.position.x - circle2.position.x, circle1.position.y - circle2.position.y);
+}
+function hasContactedCircles(circle1, circle2) {
+    return (getCirclesDistance(circle1, circle2) - circle1.radius - circle2.radius < 1) ? true : false;
+}
+function hasCollidedCircles(circle1, circle2) {
+    return (getCirclesDistance(circle1, circle2) - circle1.radius - circle2.radius < 0) ? true : false;
+}
+function hasCollidedRectangles(rectangle1, rectangle2) {
+    if (rectangle1.position.x > (rectangle2.position.x + rectangle2.size.width) || (rectangle1.position.x + rectangle1.size.width) < rectangle2.position.x
+        || rectangle1.position.y > (rectangle2.position.y + rectangle2.size.height) || (rectangle1.position.y + rectangle1.size.height) < rectangle2.position.y) {
+        return false;
+    }
+    return true;
+}
+function isFullCircleInsideAnotherCircle(innerCircle, outerCircle) {
+    return (getCirclesDistance(innerCircle, outerCircle) + innerCircle.radius <= outerCircle.radius) ? true : false;
+}
+function isFullCircleInsideRectangle(innerCircle, outerRectangle) {
+    if (innerCircle.position.x - innerCircle.radius >= outerRectangle.position.x
+        && innerCircle.position.x + innerCircle.radius <= outerRectangle.position.x + outerRectangle.size.width
+        && innerCircle.position.y - innerCircle.radius >= outerRectangle.position.y
+        && innerCircle.position.y + innerCircle.radius <= outerRectangle.position.y + outerRectangle.size.height) {
+        return true;
+    }
+    return false;
+}
+function mouseOnRectangle(mouse, rectangle) {
+    if (rectangle.position.x <= mouse.scaledPosition.x && mouse.scaledPosition.x <= (rectangle.position.x + rectangle.size.width) &&
+        rectangle.position.y <= mouse.scaledPosition.y && mouse.scaledPosition.y <= (rectangle.position.y + rectangle.size.height)) {
+        return true;
+    }
+    return false;
+}
+function mouseOnCircle(mouse, circle) {
+    if (Math.hypot(mouse.scaledPosition.x - circle.position.x, mouse.scaledPosition.y - circle.position.y) <= circle.radius) {
+        return true;
+    }
+    return false;
+}
+function mouseOnCircleAndRectangle(mouse, rangeCircle, battlefieldRectangle) {
+    if (mouseOnCircle(mouse, rangeCircle) && mouseOnRectangle(mouse, battlefieldRectangle)) {
+        return true;
+    }
+    return false;
+}
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
-canvas.width = innerWidth;
-canvas.height = innerHeight;
+canvas.width = WINDOW_WIDTH;
+canvas.height = WINDOW_HEIGHT;
+canvas.style.width = "100%";
+canvas.style.height = "100vh";
+ctx.font = "normal " + FONT_SIZE_STRING + " Black Ops One, cursive";
+ctx.textAlign = "center";
+ctx.textBaseline = "middle";
 let player;
 let listOfProjectiles;
 function init() {
     const x = canvas.width / 2;
     const y = canvas.height / 2;
-    player = new Player({ x, y }, 10, "white");
+    player = new Player({ x, y });
     listOfProjectiles = [];
 }
 let animationId;
@@ -113,32 +212,32 @@ addEventListener("resize", () => {
     canvas.height = innerHeight;
     init();
 });
-addEventListener("keydown", ({ keyCode }) => {
-    if (keyCode === 87) {
-        player.velocity.y -= 1;
+addEventListener("keydown", ({ key }) => {
+    if (key === "w") {
+        player.movingUp = true;
     }
-    else if (keyCode === 65) {
-        player.velocity.x -= 1;
+    if (key === "a") {
+        player.movingLeft = true;
     }
-    else if (keyCode === 83) {
-        player.velocity.y += 1;
+    if (key === "s") {
+        player.movingDown = true;
     }
-    else if (keyCode === 68) {
-        player.velocity.x += 1;
+    if (key === "d") {
+        player.movingRight = true;
     }
-    switch (keyCode) {
-        case 37:
-            player.velocity.x -= 1;
-            break;
-        case 40:
-            player.velocity.y += 1;
-            break;
-        case 39:
-            player.velocity.x += 1;
-            break;
-        case 38:
-            player.velocity.y -= 1;
-            break;
+});
+addEventListener("keyup", ({ key }) => {
+    if (key === "w") {
+        player.movingUp = false;
+    }
+    if (key === "a") {
+        player.movingLeft = false;
+    }
+    if (key === "s") {
+        player.movingDown = false;
+    }
+    if (key === "d") {
+        player.movingRight = false;
     }
 });
 init();
