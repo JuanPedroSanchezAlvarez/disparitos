@@ -179,11 +179,9 @@ function animate(): void {
         }
     })*/
 
-    /*if (player.powerUp === 'Automatic' && mouse.down) {
-        if (frame % 4 === 0) {
-            player.shoot(mouse, '#FFF500')
-        }
-    }*/
+    if (player.isShooting && frame % PLAYER_RATE_OF_FIRE_BLASTER === 0) {
+        player.shoot(mouse, '#FFF500');
+    }
 
     /*powerUps.forEach((powerUp, index) => {
         const dist = Math.hypot(player.position.x - powerUp.position.x, player.position.y - powerUp.position.y)
@@ -332,7 +330,7 @@ const mouse = {
 addEventListener("mousedown", ({ clientX, clientY }) => {
     mouse.x = clientX;
     mouse.y = clientY;
-    mouse.down = true;
+    player.isShooting = true;
 });
 
 addEventListener("mousemove", ({ clientX, clientY }) => {
@@ -341,7 +339,7 @@ addEventListener("mousemove", ({ clientX, clientY }) => {
 });
 
 addEventListener("mouseup", () => {
-    mouse.down = false;
+    player.isShooting = false;
 });
 
 /*addEventListener('touchstart', (event) => {
@@ -367,9 +365,9 @@ addEventListener('touchend', () => {
     }
 });*/
 
-addEventListener("click", () => {
+/*addEventListener("click", () => {
     player.shoot(mouse);
-});
+});*/
 
 addEventListener("resize", () => {
     canvas.width = innerWidth;
@@ -400,17 +398,17 @@ addEventListener("resize", () => {
 })*/
 
 addEventListener("keydown", ({ key }) => {
-    if (key === "w") { player.movingUp = true; }
-    if (key === "a") { player.movingLeft = true; }
-    if (key === "s") { player.movingDown = true; }
-    if (key === "d") { player.movingRight = true; }
+    if (key === "w") { player.isMovingUp = true; }
+    if (key === "a") { player.isMovingLeft = true; }
+    if (key === "s") { player.isMovingDown = true; }
+    if (key === "d") { player.isMovingRight = true; }
 });
 
 addEventListener("keyup", ({ key }) => {
-    if (key === "w") { player.movingUp = false; }
-    if (key === "a") { player.movingLeft = false; }
-    if (key === "s") { player.movingDown = false; }
-    if (key === "d") { player.movingRight = false; }
+    if (key === "w") { player.isMovingUp = false; }
+    if (key === "a") { player.isMovingLeft = false; }
+    if (key === "s") { player.isMovingDown = false; }
+    if (key === "d") { player.isMovingRight = false; }
 });
 
 init();

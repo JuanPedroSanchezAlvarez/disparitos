@@ -6,6 +6,8 @@ const FONT_SIZE_NUMBER = 20;
 const PLAYER_RADIUS = 16;
 const PLAYER_COLOR = "white";
 const PLAYER_SPEED = 3;
+const PLAYER_RATE_OF_FIRE_PISTOL = 16;
+const PLAYER_RATE_OF_FIRE_BLASTER = 8;
 class Position {
     constructor(x = 0, y = 0) {
         this.x = x;
@@ -39,10 +41,11 @@ class Mouse {
 class Player {
     constructor(position) {
         this.position = position;
-        this.movingUp = false;
-        this.movingLeft = false;
-        this.movingDown = false;
-        this.movingRight = false;
+        this.isMovingUp = false;
+        this.isMovingLeft = false;
+        this.isMovingDown = false;
+        this.isMovingRight = false;
+        this.isShooting = false;
     }
     draw() {
         ctx.beginPath();
@@ -52,16 +55,16 @@ class Player {
         ctx.closePath();
     }
     update() {
-        if (this.movingUp) {
+        if (this.isMovingUp) {
             player.position.y -= PLAYER_SPEED;
         }
-        if (this.movingLeft) {
+        if (this.isMovingLeft) {
             player.position.x -= PLAYER_SPEED;
         }
-        if (this.movingDown) {
+        if (this.isMovingDown) {
             player.position.y += PLAYER_SPEED;
         }
-        if (this.movingRight) {
+        if (this.isMovingRight) {
             player.position.x += PLAYER_SPEED;
         }
         if (this.position.x - PLAYER_RADIUS < 0) {
@@ -174,6 +177,9 @@ function animate() {
     frame++;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     player.update();
+    if (player.isShooting && frame % PLAYER_RATE_OF_FIRE_BLASTER === 0) {
+        player.shoot(mouse, '#FFF500');
+    }
     listOfProjectiles.forEach((projectile, index) => {
         projectile.update();
         if (projectile.position.x + projectile.radius < 0 ||
@@ -195,17 +201,14 @@ const mouse = {
 addEventListener("mousedown", ({ clientX, clientY }) => {
     mouse.x = clientX;
     mouse.y = clientY;
-    mouse.down = true;
+    player.isShooting = true;
 });
 addEventListener("mousemove", ({ clientX, clientY }) => {
     mouse.x = clientX;
     mouse.y = clientY;
 });
 addEventListener("mouseup", () => {
-    mouse.down = false;
-});
-addEventListener("click", () => {
-    player.shoot(mouse);
+    player.isShooting = false;
 });
 addEventListener("resize", () => {
     canvas.width = innerWidth;
@@ -214,30 +217,30 @@ addEventListener("resize", () => {
 });
 addEventListener("keydown", ({ key }) => {
     if (key === "w") {
-        player.movingUp = true;
+        player.isMovingUp = true;
     }
     if (key === "a") {
-        player.movingLeft = true;
+        player.isMovingLeft = true;
     }
     if (key === "s") {
-        player.movingDown = true;
+        player.isMovingDown = true;
     }
     if (key === "d") {
-        player.movingRight = true;
+        player.isMovingRight = true;
     }
 });
 addEventListener("keyup", ({ key }) => {
     if (key === "w") {
-        player.movingUp = false;
+        player.isMovingUp = false;
     }
     if (key === "a") {
-        player.movingLeft = false;
+        player.isMovingLeft = false;
     }
     if (key === "s") {
-        player.movingDown = false;
+        player.isMovingDown = false;
     }
     if (key === "d") {
-        player.movingRight = false;
+        player.isMovingRight = false;
     }
 });
 init();

@@ -1,17 +1,19 @@
 class Player {
 
     position: { x: number; y: number };
-    movingUp: boolean;
-    movingLeft: boolean;
-    movingDown: boolean;
-    movingRight: boolean;
+    isMovingUp: boolean;
+    isMovingLeft: boolean;
+    isMovingDown: boolean;
+    isMovingRight: boolean;
+    isShooting: boolean;
 
     constructor(position: { x: number; y: number }) {
         this.position = position;
-        this.movingUp = false;
-        this.movingLeft = false;
-        this.movingDown = false;
-        this.movingRight = false;
+        this.isMovingUp = false;
+        this.isMovingLeft = false;
+        this.isMovingDown = false;
+        this.isMovingRight = false;
+        this.isShooting = false;
     }
 
     draw(): void {
@@ -23,10 +25,10 @@ class Player {
     }
 
     update(): void {
-        if (this.movingUp) { player.position.y -= PLAYER_SPEED; }
-        if (this.movingLeft) { player.position.x -= PLAYER_SPEED; }
-        if (this.movingDown) { player.position.y += PLAYER_SPEED; }
-        if (this.movingRight) { player.position.x += PLAYER_SPEED; }
+        if (this.isMovingUp) { player.position.y -= PLAYER_SPEED; }
+        if (this.isMovingLeft) { player.position.x -= PLAYER_SPEED; }
+        if (this.isMovingDown) { player.position.y += PLAYER_SPEED; }
+        if (this.isMovingRight) { player.position.x += PLAYER_SPEED; }
 
         if (this.position.x - PLAYER_RADIUS < 0) {
             this.position.x = 0 + PLAYER_RADIUS;

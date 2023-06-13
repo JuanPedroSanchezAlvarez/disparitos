@@ -10,3 +10,5 @@ const FONT_SIZE_NUMBER: number = 20;
 const PLAYER_RADIUS: number = 16;
 const PLAYER_COLOR: string = "white";
 const PLAYER_SPEED: number = 3;
+const PLAYER_RATE_OF_FIRE_PISTOL: number = 16;
+const PLAYER_RATE_OF_FIRE_BLASTER: number = 8;
