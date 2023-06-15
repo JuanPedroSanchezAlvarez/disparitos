@@ -205,10 +205,10 @@ function animate(): void {
         projectile.update();
         // remove from edges of screen
         if (
-            projectile.position.x + projectile.radius < 0 ||
-            projectile.position.x - projectile.radius > canvas!.width ||
-            projectile.position.y + projectile.radius < 0 ||
-            projectile.position.y - projectile.radius > canvas!.height
+            projectile.positionFrom.x < 0 ||
+            projectile.positionFrom.x > canvas.width ||
+            projectile.positionFrom.y < 0 ||
+            projectile.positionFrom.y > canvas.height
         ) {
             setTimeout(() => {
                 listOfProjectiles.splice(index, 1)

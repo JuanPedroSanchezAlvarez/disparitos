@@ -45,7 +45,7 @@ class Player {
 
         if (this.isShooting) {
             if (this.shootingFrame === 0 || this.shootingFrame % PLAYER_RATE_OF_FIRE_BLASTER === 0) {
-                this.shoot(mouse, '#FFF500');
+                this.shoot(mouse);
             }
             this.shootingFrame++;
         } else {
@@ -57,11 +57,12 @@ class Player {
         this.draw();
     }
 
-    shoot(mouse: { y: number; x: number }, color = 'white'): void {
+    shoot(mouse: { y: number; x: number }): void {
+        const positionFrom = { x: this.position.x, y: this.position.y };
         const angle = Math.atan2(mouse.y - this.position.y, mouse.x - this.position.x);
-        const velocity = { x: Math.cos(angle) * 5, y: Math.sin(angle) * 5 };
-        const position = { x: this.position.x, y: this.position.y };
-        listOfProjectiles.push(new Projectile(position, 5, color, velocity));
+        const positionTo = { x: positionFrom.x + (Math.cos(angle) * LASER_LENGTH), y: positionFrom.y + (Math.sin(angle) * LASER_LENGTH) };
+        const velocity = { x: Math.cos(angle) * LASER_SPEED, y: Math.sin(angle) * LASER_SPEED };
+        listOfProjectiles.push(new Projectile(positionFrom, positionTo, velocity));
         //shootAudio.play();
     }
 

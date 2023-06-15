@@ -1,28 +1,32 @@
 class Projectile {
 
-    position: { x: number; y: number };
-    radius: number;
-    color: string;
+    positionFrom: { x: number; y: number };
+    positionTo: { x: number; y: number };
     velocity: { x: number; y: number };
 
-    constructor(position: { x: number; y: number }, radius: number, color: string, velocity: { x: number; y: number }) {
-        this.position = position;
-        this.radius = radius;
-        this.color = color;
+    constructor(positionFrom: { x: number; y: number }, positionTo: { x: number; y: number }, velocity: { x: number; y: number }) {
+        this.positionFrom = positionFrom;
+        this.positionTo = positionTo;
         this.velocity = velocity;
     }
 
     draw(): void {
         ctx.beginPath();
-        ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2, false);
-        ctx.fillStyle = this.color;
-        ctx.fill();
+        ctx.strokeStyle = LASER_COLOR;
+        ctx.lineWidth = LASER_WIDTH;
+        ctx.lineCap = "round";
+        ctx.moveTo(this.positionFrom.x, this.positionFrom.y);
+        ctx.lineTo(this.positionTo.x, this.positionTo.y);
+        ctx.stroke();
+        ctx.closePath();
     }
 
     update(): void {
+        this.positionFrom.x = this.positionFrom.x + this.velocity.x;
+        this.positionFrom.y = this.positionFrom.y + this.velocity.y;
+        this.positionTo.x = this.positionTo.x + this.velocity.x;
+        this.positionTo.y = this.positionTo.y + this.velocity.y;
         this.draw();
-        this.position.x = this.position.x + this.velocity.x;
-        this.position.y = this.position.y + this.velocity.y;
     }
 
 }

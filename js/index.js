@@ -8,6 +8,10 @@ const PLAYER_COLOR = "white";
 const PLAYER_SPEED = 3;
 const PLAYER_RATE_OF_FIRE_PISTOL = 16;
 const PLAYER_RATE_OF_FIRE_BLASTER = 8;
+const LASER_LENGTH = 16;
+const LASER_WIDTH = 3;
+const LASER_SPEED = 10;
+const LASER_COLOR = "yellow";
 class Position {
     constructor(x = 0, y = 0) {
         this.x = x;
@@ -82,7 +86,7 @@ class Player {
         }
         if (this.isShooting) {
             if (this.shootingFrame === 0 || this.shootingFrame % PLAYER_RATE_OF_FIRE_BLASTER === 0) {
-                this.shoot(mouse, '#FFF500');
+                this.shoot(mouse);
             }
             this.shootingFrame++;
         }
@@ -93,30 +97,36 @@ class Player {
         }
         this.draw();
     }
-    shoot(mouse, color = 'white') {
+    shoot(mouse) {
+        const positionFrom = { x: this.position.x, y: this.position.y };
         const angle = Math.atan2(mouse.y - this.position.y, mouse.x - this.position.x);
-        const velocity = { x: Math.cos(angle) * 5, y: Math.sin(angle) * 5 };
-        const position = { x: this.position.x, y: this.position.y };
-        listOfProjectiles.push(new Projectile(position, 5, color, velocity));
+        const positionTo = { x: positionFrom.x + (Math.cos(angle) * LASER_LENGTH), y: positionFrom.y + (Math.sin(angle) * LASER_LENGTH) };
+        const velocity = { x: Math.cos(angle) * LASER_SPEED, y: Math.sin(angle) * LASER_SPEED };
+        listOfProjectiles.push(new Projectile(positionFrom, positionTo, velocity));
     }
 }
 class Projectile {
-    constructor(position, radius, color, velocity) {
-        this.position = position;
-        this.radius = radius;
-        this.color = color;
+    constructor(positionFrom, positionTo, velocity) {
+        this.positionFrom = positionFrom;
+        this.positionTo = positionTo;
         this.velocity = velocity;
     }
     draw() {
         ctx.beginPath();
-        ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2, false);
-        ctx.fillStyle = this.color;
-        ctx.fill();
+        ctx.strokeStyle = LASER_COLOR;
+        ctx.lineWidth = LASER_WIDTH;
+        ctx.lineCap = "round";
+        ctx.moveTo(this.positionFrom.x, this.positionFrom.y);
+        ctx.lineTo(this.positionTo.x, this.positionTo.y);
+        ctx.stroke();
+        ctx.closePath();
     }
     update() {
+        this.positionFrom.x = this.positionFrom.x + this.velocity.x;
+        this.positionFrom.y = this.positionFrom.y + this.velocity.y;
+        this.positionTo.x = this.positionTo.x + this.velocity.x;
+        this.positionTo.y = this.positionTo.y + this.velocity.y;
         this.draw();
-        this.position.x = this.position.x + this.velocity.x;
-        this.position.y = this.position.y + this.velocity.y;
     }
 }
 function getCirclesDistance(circle1, circle2) {
@@ -191,10 +201,10 @@ function animate() {
     player.update();
     listOfProjectiles.forEach((projectile, index) => {
         projectile.update();
-        if (projectile.position.x + projectile.radius < 0 ||
-            projectile.position.x - projectile.radius > canvas.width ||
-            projectile.position.y + projectile.radius < 0 ||
-            projectile.position.y - projectile.radius > canvas.height) {
+        if (projectile.positionFrom.x < 0 ||
+            projectile.positionFrom.x > canvas.width ||
+            projectile.positionFrom.y < 0 ||
+            projectile.positionFrom.y > canvas.height) {
             setTimeout(() => {
                 listOfProjectiles.splice(index, 1);
             }, 0);
