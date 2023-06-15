@@ -46,6 +46,7 @@ class Player {
         this.isMovingDown = false;
         this.isMovingRight = false;
         this.isShooting = false;
+        this.shootingFrame = 0;
     }
     draw() {
         ctx.beginPath();
@@ -78,6 +79,17 @@ class Player {
         }
         else if (this.position.y + PLAYER_RADIUS > canvas.height) {
             this.position.y = canvas.height - PLAYER_RADIUS;
+        }
+        if (this.isShooting) {
+            if (this.shootingFrame === 0 || this.shootingFrame % PLAYER_RATE_OF_FIRE_BLASTER === 0) {
+                this.shoot(mouse, '#FFF500');
+            }
+            this.shootingFrame++;
+        }
+        else {
+            if (this.shootingFrame != 0) {
+                this.shootingFrame = 0;
+            }
         }
         this.draw();
     }
@@ -174,12 +186,9 @@ function init() {
 let animationId;
 let frame = 0;
 function animate() {
-    frame++;
+    frame = frame >= 60 ? 1 : frame + 1;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     player.update();
-    if (player.isShooting && frame % PLAYER_RATE_OF_FIRE_BLASTER === 0) {
-        player.shoot(mouse, '#FFF500');
-    }
     listOfProjectiles.forEach((projectile, index) => {
         projectile.update();
         if (projectile.position.x + projectile.radius < 0 ||

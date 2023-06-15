@@ -133,7 +133,8 @@ let animationId: number;
 let frame: number = 0;
 function animate(): void {
     //animationId = window.requestAnimationFrame(animate);
-    frame++;
+    frame = frame >= 60 ? 1 : frame + 1;
+    
     //ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'
     //ctx.fillRect(0, 0, canvas!.width, canvas!.height)
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -178,10 +179,6 @@ function animate(): void {
             particle.update()
         }
     })*/
-
-    if (player.isShooting && frame % PLAYER_RATE_OF_FIRE_BLASTER === 0) {
-        player.shoot(mouse, '#FFF500');
-    }
 
     /*powerUps.forEach((powerUp, index) => {
         const dist = Math.hypot(player.position.x - powerUp.position.x, player.position.y - powerUp.position.y)

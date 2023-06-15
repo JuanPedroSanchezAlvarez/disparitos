@@ -6,6 +6,7 @@ class Player {
     isMovingDown: boolean;
     isMovingRight: boolean;
     isShooting: boolean;
+    shootingFrame: number;
 
     constructor(position: { x: number; y: number }) {
         this.position = position;
@@ -14,6 +15,7 @@ class Player {
         this.isMovingDown = false;
         this.isMovingRight = false;
         this.isShooting = false;
+        this.shootingFrame = 0;
     }
 
     draw(): void {
@@ -39,6 +41,17 @@ class Player {
             this.position.y = 0 + PLAYER_RADIUS;
         } else if (this.position.y + PLAYER_RADIUS > canvas.height) {
             this.position.y = canvas.height - PLAYER_RADIUS;
+        }
+
+        if (this.isShooting) {
+            if (this.shootingFrame === 0 || this.shootingFrame % PLAYER_RATE_OF_FIRE_BLASTER === 0) {
+                this.shoot(mouse, '#FFF500');
+            }
+            this.shootingFrame++;
+        } else {
+            if (this.shootingFrame != 0) {
+                this.shootingFrame = 0;
+            }
         }
 
         this.draw();
