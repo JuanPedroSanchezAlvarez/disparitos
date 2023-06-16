@@ -4,6 +4,7 @@
     margin: 0;
     padding: 0;
     border: none;
+    cursor: url(../images/cursor/cursor-green.png) 16 16, auto;
 }
 
 body, html {

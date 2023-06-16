@@ -318,6 +318,7 @@ function animate(): void {
             }
         })
     })*/
+
     animationId = window.requestAnimationFrame(animate);
 }
 
@@ -329,8 +330,13 @@ addEventListener("mousemove", ({ clientX, clientY }) => {
     mouse.scaledPosition.y = clientY * (canvas.height / canvas.clientHeight);
 });
 
-addEventListener("mousedown", () => { player.isShooting = true; });
-addEventListener("mouseup", () => { player.isShooting = false; });
+addEventListener("mousedown", () => {
+    player.isShooting = true;
+});
+
+addEventListener("mouseup", () => {
+    player.isShooting = false;
+});
 
 /*addEventListener('touchstart', (event) => {
     mouse.x = event.touches[0]!.clientX

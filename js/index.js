@@ -219,8 +219,12 @@ addEventListener("mousemove", ({ clientX, clientY }) => {
     mouse.scaledPosition.x = clientX * (canvas.width / canvas.clientWidth);
     mouse.scaledPosition.y = clientY * (canvas.height / canvas.clientHeight);
 });
-addEventListener("mousedown", () => { player.isShooting = true; });
-addEventListener("mouseup", () => { player.isShooting = false; });
+addEventListener("mousedown", () => {
+    player.isShooting = true;
+});
+addEventListener("mouseup", () => {
+    player.isShooting = false;
+});
 addEventListener("resize", () => {
     canvas.width = innerWidth;
     canvas.height = innerHeight;
