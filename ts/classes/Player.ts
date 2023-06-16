@@ -58,10 +58,14 @@ class Player {
     }
 
     shoot(mouse: Mouse): void {
-        const positionFrom = new Position(this.circle.position.x, this.circle.position.y);
-        const angle = Math.atan2(mouse.scaledPosition.y - this.circle.position.y, mouse.scaledPosition.x - this.circle.position.x);
-        const positionTo = new Position(positionFrom.x + (Math.cos(angle) * LASER_LENGTH), positionFrom.y + (Math.sin(angle) * LASER_LENGTH));
-        const velocity = { x: Math.cos(angle) * LASER_SPEED, y: Math.sin(angle) * LASER_SPEED };
+        const positionFrom: Position = new Position(this.circle.position.x, this.circle.position.y);
+        const angle: number = Math.atan2(mouse.scaledPosition.y - this.circle.position.y, mouse.scaledPosition.x - this.circle.position.x);
+        // Math.random() generates a random number between 0 and 1. Modified to generate it between -0.05 and 0.05.
+        const modifier: number = (Math.random() / 10) - 0.05;
+        const angleModified: number = angle + modifier;
+        console.log(modifier);
+        const positionTo: Position = new Position(positionFrom.x + (Math.cos(angleModified) * LASER_LENGTH), positionFrom.y + (Math.sin(angleModified) * LASER_LENGTH));
+        const velocity = { x: Math.cos(angleModified) * LASER_SPEED, y: Math.sin(angleModified) * LASER_SPEED };
         listOfProjectiles.push(new Projectile(positionFrom, positionTo, velocity));
         //shootAudio.play();
     }
