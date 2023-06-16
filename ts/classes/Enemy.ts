@@ -41,7 +41,7 @@ class Enemy {
             this.position.x = this.position.x + this.velocity.x;
             this.position.y = this.position.y + this.velocity.y;
         } else if (this.type === 'homing') {
-            const angle = Math.atan2(player.position.y - this.position.y, player.position.x - this.position.x);
+            const angle = Math.atan2(player.circle.position.y - this.position.y, player.circle.position.x - this.position.x);
             this.velocity = { x: Math.cos(angle), y: Math.sin(angle) };
             this.position.x = this.position.x + this.velocity.x;
             this.position.y = this.position.y + this.velocity.y;
@@ -52,7 +52,7 @@ class Enemy {
             this.position.x = this.center.x + Math.cos(this.radians) * 100;
             this.position.y = this.center.y + Math.sin(this.radians) * 100;
         } else if (this.type === 'homingSpinning') {
-            const angle = Math.atan2(player.position.y - this.position.y, player.position.x - this.position.x);
+            const angle = Math.atan2(player.circle.position.y - this.position.y, player.circle.position.x - this.position.x);
             this.velocity = { x: Math.cos(angle), y: Math.sin(angle) };
             this.radians += 0.05;
             this.center.x += this.velocity.x;

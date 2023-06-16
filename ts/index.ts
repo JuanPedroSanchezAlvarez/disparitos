@@ -36,6 +36,9 @@ powerUpImg.src = './images/lightning.png'
 
 const friction = 0.99
 */
+
+const mouse = new Mouse();
+
 let player: Player;
 //let powerUps: PowerUp[] = []
 let listOfProjectiles: Projectile[];
@@ -46,7 +49,7 @@ let listOfProjectiles: Projectile[];
 function init(): void {
     const x: number = canvas.width / 2;
     const y: number = canvas.height / 2;
-    player = new Player({x, y});
+    player = new Player(new Circle(x, y, PLAYER_RADIUS));
     //powerUps = []
     listOfProjectiles = [];
     //enemies = []
@@ -318,26 +321,16 @@ function animate(): void {
     animationId = window.requestAnimationFrame(animate);
 }
 
-const mouse = {
-    down: false,
-    x: 0,
-    y: 0
-};
-
-addEventListener("mousedown", ({ clientX, clientY }) => {
-    mouse.x = clientX;
-    mouse.y = clientY;
-    player.isShooting = true;
-});
-
 addEventListener("mousemove", ({ clientX, clientY }) => {
-    mouse.x = clientX;
-    mouse.y = clientY;
+    mouse.realPosition.x = clientX;
+    mouse.realPosition.y = clientY;
+    // Escalamos la posición real del click al tamaño de la pantalla del dispositivo.
+    mouse.scaledPosition.x = clientX * (canvas.width / canvas.clientWidth);
+    mouse.scaledPosition.y = clientY * (canvas.height / canvas.clientHeight);
 });
 
-addEventListener("mouseup", () => {
-    player.isShooting = false;
-});
+addEventListener("mousedown", () => { player.isShooting = true; });
+addEventListener("mouseup", () => { player.isShooting = false; });
 
 /*addEventListener('touchstart', (event) => {
     mouse.x = event.touches[0]!.clientX

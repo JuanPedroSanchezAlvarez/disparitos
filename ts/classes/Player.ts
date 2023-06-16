@@ -1,6 +1,6 @@
 class Player {
 
-    position: { x: number; y: number };
+    circle: Circle;
     isMovingUp: boolean;
     isMovingLeft: boolean;
     isMovingDown: boolean;
@@ -8,8 +8,8 @@ class Player {
     isShooting: boolean;
     shootingFrame: number;
 
-    constructor(position: { x: number; y: number }) {
-        this.position = position;
+    constructor(circle: Circle) {
+        this.circle = circle;
         this.isMovingUp = false;
         this.isMovingLeft = false;
         this.isMovingDown = false;
@@ -21,26 +21,26 @@ class Player {
     draw(): void {
         ctx.beginPath();
         ctx.fillStyle = PLAYER_COLOR;
-        ctx.arc(this.position.x, this.position.y, PLAYER_RADIUS, 0, Math.PI * 2, false);
+        ctx.arc(this.circle.position.x, this.circle.position.y, this.circle.radius, 0, Math.PI * 2, false);
         ctx.fill();
         ctx.closePath();
     }
 
     update(): void {
-        if (this.isMovingUp) { player.position.y -= PLAYER_SPEED; }
-        if (this.isMovingLeft) { player.position.x -= PLAYER_SPEED; }
-        if (this.isMovingDown) { player.position.y += PLAYER_SPEED; }
-        if (this.isMovingRight) { player.position.x += PLAYER_SPEED; }
+        if (this.isMovingUp) { this.circle.position.y -= PLAYER_SPEED; }
+        if (this.isMovingLeft) { this.circle.position.x -= PLAYER_SPEED; }
+        if (this.isMovingDown) { this.circle.position.y += PLAYER_SPEED; }
+        if (this.isMovingRight) { this.circle.position.x += PLAYER_SPEED; }
 
-        if (this.position.x - PLAYER_RADIUS < 0) {
-            this.position.x = 0 + PLAYER_RADIUS;
-        } else if (this.position.x + PLAYER_RADIUS > canvas.width) {
-            this.position.x = canvas.width - PLAYER_RADIUS;
+        if (this.circle.position.x - this.circle.radius < 0) {
+            this.circle.position.x = 0 + this.circle.radius;
+        } else if (this.circle.position.x + this.circle.radius > canvas.width) {
+            this.circle.position.x = canvas.width - this.circle.radius;
         }
-        if (this.position.y - PLAYER_RADIUS < 0) {
-            this.position.y = 0 + PLAYER_RADIUS;
-        } else if (this.position.y + PLAYER_RADIUS > canvas.height) {
-            this.position.y = canvas.height - PLAYER_RADIUS;
+        if (this.circle.position.y - this.circle.radius < 0) {
+            this.circle.position.y = 0 + this.circle.radius;
+        } else if (this.circle.position.y + this.circle.radius > canvas.height) {
+            this.circle.position.y = canvas.height - this.circle.radius;
         }
 
         if (this.isShooting) {
@@ -57,10 +57,10 @@ class Player {
         this.draw();
     }
 
-    shoot(mouse: { y: number; x: number }): void {
-        const positionFrom = { x: this.position.x, y: this.position.y };
-        const angle = Math.atan2(mouse.y - this.position.y, mouse.x - this.position.x);
-        const positionTo = { x: positionFrom.x + (Math.cos(angle) * LASER_LENGTH), y: positionFrom.y + (Math.sin(angle) * LASER_LENGTH) };
+    shoot(mouse: Mouse): void {
+        const positionFrom = new Position(this.circle.position.x, this.circle.position.y);
+        const angle = Math.atan2(mouse.scaledPosition.y - this.circle.position.y, mouse.scaledPosition.x - this.circle.position.x);
+        const positionTo = new Position(positionFrom.x + (Math.cos(angle) * LASER_LENGTH), positionFrom.y + (Math.sin(angle) * LASER_LENGTH));
         const velocity = { x: Math.cos(angle) * LASER_SPEED, y: Math.sin(angle) * LASER_SPEED };
         listOfProjectiles.push(new Projectile(positionFrom, positionTo, velocity));
         //shootAudio.play();

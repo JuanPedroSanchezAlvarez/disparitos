@@ -10,7 +10,7 @@ const PLAYER_RATE_OF_FIRE_PISTOL = 16;
 const PLAYER_RATE_OF_FIRE_BLASTER = 8;
 const LASER_LENGTH = 16;
 const LASER_WIDTH = 3;
-const LASER_SPEED = 10;
+const LASER_SPEED = 20;
 const LASER_COLOR = "yellow";
 class Position {
     constructor(x = 0, y = 0) {
@@ -43,8 +43,8 @@ class Mouse {
     }
 }
 class Player {
-    constructor(position) {
-        this.position = position;
+    constructor(circle) {
+        this.circle = circle;
         this.isMovingUp = false;
         this.isMovingLeft = false;
         this.isMovingDown = false;
@@ -55,34 +55,34 @@ class Player {
     draw() {
         ctx.beginPath();
         ctx.fillStyle = PLAYER_COLOR;
-        ctx.arc(this.position.x, this.position.y, PLAYER_RADIUS, 0, Math.PI * 2, false);
+        ctx.arc(this.circle.position.x, this.circle.position.y, this.circle.radius, 0, Math.PI * 2, false);
         ctx.fill();
         ctx.closePath();
     }
     update() {
         if (this.isMovingUp) {
-            player.position.y -= PLAYER_SPEED;
+            this.circle.position.y -= PLAYER_SPEED;
         }
         if (this.isMovingLeft) {
-            player.position.x -= PLAYER_SPEED;
+            this.circle.position.x -= PLAYER_SPEED;
         }
         if (this.isMovingDown) {
-            player.position.y += PLAYER_SPEED;
+            this.circle.position.y += PLAYER_SPEED;
         }
         if (this.isMovingRight) {
-            player.position.x += PLAYER_SPEED;
+            this.circle.position.x += PLAYER_SPEED;
         }
-        if (this.position.x - PLAYER_RADIUS < 0) {
-            this.position.x = 0 + PLAYER_RADIUS;
+        if (this.circle.position.x - this.circle.radius < 0) {
+            this.circle.position.x = 0 + this.circle.radius;
         }
-        else if (this.position.x + PLAYER_RADIUS > canvas.width) {
-            this.position.x = canvas.width - PLAYER_RADIUS;
+        else if (this.circle.position.x + this.circle.radius > canvas.width) {
+            this.circle.position.x = canvas.width - this.circle.radius;
         }
-        if (this.position.y - PLAYER_RADIUS < 0) {
-            this.position.y = 0 + PLAYER_RADIUS;
+        if (this.circle.position.y - this.circle.radius < 0) {
+            this.circle.position.y = 0 + this.circle.radius;
         }
-        else if (this.position.y + PLAYER_RADIUS > canvas.height) {
-            this.position.y = canvas.height - PLAYER_RADIUS;
+        else if (this.circle.position.y + this.circle.radius > canvas.height) {
+            this.circle.position.y = canvas.height - this.circle.radius;
         }
         if (this.isShooting) {
             if (this.shootingFrame === 0 || this.shootingFrame % PLAYER_RATE_OF_FIRE_BLASTER === 0) {
@@ -98,9 +98,9 @@ class Player {
         this.draw();
     }
     shoot(mouse) {
-        const positionFrom = { x: this.position.x, y: this.position.y };
-        const angle = Math.atan2(mouse.y - this.position.y, mouse.x - this.position.x);
-        const positionTo = { x: positionFrom.x + (Math.cos(angle) * LASER_LENGTH), y: positionFrom.y + (Math.sin(angle) * LASER_LENGTH) };
+        const positionFrom = new Position(this.circle.position.x, this.circle.position.y);
+        const angle = Math.atan2(mouse.scaledPosition.y - this.circle.position.y, mouse.scaledPosition.x - this.circle.position.x);
+        const positionTo = new Position(positionFrom.x + (Math.cos(angle) * LASER_LENGTH), positionFrom.y + (Math.sin(angle) * LASER_LENGTH));
         const velocity = { x: Math.cos(angle) * LASER_SPEED, y: Math.sin(angle) * LASER_SPEED };
         listOfProjectiles.push(new Projectile(positionFrom, positionTo, velocity));
     }
@@ -185,12 +185,13 @@ canvas.style.height = "100vh";
 ctx.font = "normal " + FONT_SIZE_STRING + " Black Ops One, cursive";
 ctx.textAlign = "center";
 ctx.textBaseline = "middle";
+const mouse = new Mouse();
 let player;
 let listOfProjectiles;
 function init() {
     const x = canvas.width / 2;
     const y = canvas.height / 2;
-    player = new Player({ x, y });
+    player = new Player(new Circle(x, y, PLAYER_RADIUS));
     listOfProjectiles = [];
 }
 let animationId;
@@ -212,23 +213,14 @@ function animate() {
     });
     animationId = window.requestAnimationFrame(animate);
 }
-const mouse = {
-    down: false,
-    x: 0,
-    y: 0
-};
-addEventListener("mousedown", ({ clientX, clientY }) => {
-    mouse.x = clientX;
-    mouse.y = clientY;
-    player.isShooting = true;
-});
 addEventListener("mousemove", ({ clientX, clientY }) => {
-    mouse.x = clientX;
-    mouse.y = clientY;
+    mouse.realPosition.x = clientX;
+    mouse.realPosition.y = clientY;
+    mouse.scaledPosition.x = clientX * (canvas.width / canvas.clientWidth);
+    mouse.scaledPosition.y = clientY * (canvas.height / canvas.clientHeight);
 });
-addEventListener("mouseup", () => {
-    player.isShooting = false;
-});
+addEventListener("mousedown", () => { player.isShooting = true; });
+addEventListener("mouseup", () => { player.isShooting = false; });
 addEventListener("resize", () => {
     canvas.width = innerWidth;
     canvas.height = innerHeight;
@@ -317,7 +309,7 @@ class Enemy {
             this.position.y = this.position.y + this.velocity.y;
         }
         else if (this.type === 'homing') {
-            const angle = Math.atan2(player.position.y - this.position.y, player.position.x - this.position.x);
+            const angle = Math.atan2(player.circle.position.y - this.position.y, player.circle.position.x - this.position.x);
             this.velocity = { x: Math.cos(angle), y: Math.sin(angle) };
             this.position.x = this.position.x + this.velocity.x;
             this.position.y = this.position.y + this.velocity.y;
@@ -330,7 +322,7 @@ class Enemy {
             this.position.y = this.center.y + Math.sin(this.radians) * 100;
         }
         else if (this.type === 'homingSpinning') {
-            const angle = Math.atan2(player.position.y - this.position.y, player.position.x - this.position.x);
+            const angle = Math.atan2(player.circle.position.y - this.position.y, player.circle.position.x - this.position.x);
             this.velocity = { x: Math.cos(angle), y: Math.sin(angle) };
             this.radians += 0.05;
             this.center.x += this.velocity.x;

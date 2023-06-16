@@ -1,10 +1,10 @@
 class Projectile {
 
-    positionFrom: { x: number; y: number };
-    positionTo: { x: number; y: number };
+    positionFrom: Position;
+    positionTo: Position;
     velocity: { x: number; y: number };
 
-    constructor(positionFrom: { x: number; y: number }, positionTo: { x: number; y: number }, velocity: { x: number; y: number }) {
+    constructor(positionFrom: Position, positionTo: Position, velocity: { x: number; y: number }) {
         this.positionFrom = positionFrom;
         this.positionTo = positionTo;
         this.velocity = velocity;
