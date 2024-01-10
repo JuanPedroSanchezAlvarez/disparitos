@@ -39,6 +39,8 @@ const friction = 0.99
 
 const mouse = new Mouse();
 
+const starship = new Starship();
+
 let player: Player;
 //let powerUps: PowerUp[] = []
 let listOfProjectiles: Projectile[];
@@ -172,6 +174,8 @@ function animate(): void {
 
         backgroundParticle.update()
     })*/
+
+    starship.arrayOfRooms[starship.activeRoom.x]![starship.activeRoom.y]!.update();
 
     player.update();
     

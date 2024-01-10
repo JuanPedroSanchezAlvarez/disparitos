@@ -13,8 +13,8 @@ function mouseOnCircle(mouse: Mouse, circle: Circle): boolean {
     return false;
 }
 
-function mouseOnCircleAndRectangle(mouse: Mouse, rangeCircle: Circle, battlefieldRectangle: Rectangle): boolean {
-    if (mouseOnCircle(mouse, rangeCircle) && mouseOnRectangle(mouse, battlefieldRectangle)) {
+function mouseOnCircleAndRectangle(mouse: Mouse, rangeCircle: Circle, rectangle: Rectangle): boolean {
+    if (mouseOnCircle(mouse, rangeCircle) && mouseOnRectangle(mouse, rectangle)) {
         return true;
     }
     return false;

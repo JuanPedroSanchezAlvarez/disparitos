@@ -3,8 +3,8 @@ const WINDOW_WIDTH: number = 1920;
 const WINDOW_HEIGHT: number = 1080;
 
 // FONT
-const FONT_SIZE_STRING: string = "20px";
-const FONT_SIZE_NUMBER: number = 20;
+const FONT_SIZE_STRING: string = "32px";
+const FONT_SIZE_NUMBER: number = 32;
 
 // PLAYER
 const PLAYER_RADIUS: number = 16;

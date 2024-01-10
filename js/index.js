@@ -1,8 +1,16 @@
 "use strict";
+var DOOR;
+(function (DOOR) {
+    DOOR[DOOR["UP"] = 0] = "UP";
+    DOOR[DOOR["DOWN"] = 1] = "DOWN";
+    DOOR[DOOR["LEFT"] = 2] = "LEFT";
+    DOOR[DOOR["RIGHT"] = 3] = "RIGHT";
+})(DOOR || (DOOR = {}));
+;
 const WINDOW_WIDTH = 1920;
 const WINDOW_HEIGHT = 1080;
-const FONT_SIZE_STRING = "20px";
-const FONT_SIZE_NUMBER = 20;
+const FONT_SIZE_STRING = "32px";
+const FONT_SIZE_NUMBER = 32;
 const PLAYER_RADIUS = 16;
 const PLAYER_COLOR = "white";
 const PLAYER_SPEED = 3;
@@ -40,6 +48,95 @@ class Mouse {
     constructor() {
         this.realPosition = new Position();
         this.scaledPosition = new Position();
+    }
+}
+class Starship {
+    constructor() {
+        this.arrayOfRooms = [];
+        for (let x = 0; x < 3; x++) {
+            this.arrayOfRooms[x] = [];
+            for (let y = 0; y < 3; y++) {
+                let listOfDoors = [];
+                listOfDoors.push(DOOR.UP);
+                listOfDoors.push(DOOR.DOWN);
+                listOfDoors.push(DOOR.LEFT);
+                listOfDoors.push(DOOR.RIGHT);
+                if (x == 0) {
+                    listOfDoors.forEach((door, index) => { if (door === DOOR.UP) {
+                        listOfDoors.splice(index, 1);
+                    } });
+                }
+                if (x == 2) {
+                    listOfDoors.forEach((door, index) => { if (door === DOOR.DOWN) {
+                        listOfDoors.splice(index, 1);
+                    } });
+                }
+                if (y == 0) {
+                    listOfDoors.forEach((door, index) => { if (door === DOOR.LEFT) {
+                        listOfDoors.splice(index, 1);
+                    } });
+                }
+                if (y == 2) {
+                    listOfDoors.forEach((door, index) => { if (door === DOOR.RIGHT) {
+                        listOfDoors.splice(index, 1);
+                    } });
+                }
+                this.arrayOfRooms[x][y] = new Room("Room " + x.toString() + y.toString(), listOfDoors);
+            }
+        }
+        this.activeRoom = new Position(1, 1);
+    }
+    draw() {
+    }
+    update() {
+        this.draw();
+    }
+}
+class Room {
+    constructor(name, listOfDoors) {
+        this.name = name;
+        this.rectangle = new Rectangle(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+        this.listOfDoors = listOfDoors;
+    }
+    draw() {
+        this.listOfDoors.forEach((door) => {
+            ctx.beginPath();
+            ctx.strokeStyle = "red";
+            ctx.lineWidth = 10;
+            ctx.lineCap = "round";
+            switch (door) {
+                case DOOR.UP: {
+                    ctx.moveTo((WINDOW_WIDTH / 2) - 30, 0);
+                    ctx.lineTo((WINDOW_WIDTH / 2) + 30, 0);
+                    break;
+                }
+                case DOOR.DOWN: {
+                    ctx.moveTo((WINDOW_WIDTH / 2) - 30, WINDOW_HEIGHT);
+                    ctx.lineTo((WINDOW_WIDTH / 2) + 30, WINDOW_HEIGHT);
+                    break;
+                }
+                case DOOR.LEFT: {
+                    ctx.moveTo(0, (WINDOW_HEIGHT / 2) - 30);
+                    ctx.lineTo(0, (WINDOW_HEIGHT / 2) + 30);
+                    break;
+                }
+                case DOOR.RIGHT: {
+                    ctx.moveTo(WINDOW_WIDTH, (WINDOW_HEIGHT / 2) - 30);
+                    ctx.lineTo(WINDOW_WIDTH, (WINDOW_HEIGHT / 2) + 30);
+                    break;
+                }
+            }
+            ctx.stroke();
+            ctx.closePath();
+        });
+        ctx.strokeStyle = "red";
+        ctx.lineWidth = 4;
+        ctx.strokeText(this.name, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
+        ctx.fillStyle = "white";
+        ctx.fillText(this.name, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
+    }
+    update() {
+        this.draw();
     }
 }
 class Player {
@@ -173,8 +270,8 @@ function mouseOnCircle(mouse, circle) {
     }
     return false;
 }
-function mouseOnCircleAndRectangle(mouse, rangeCircle, battlefieldRectangle) {
-    if (mouseOnCircle(mouse, rangeCircle) && mouseOnRectangle(mouse, battlefieldRectangle)) {
+function mouseOnCircleAndRectangle(mouse, rangeCircle, rectangle) {
+    if (mouseOnCircle(mouse, rangeCircle) && mouseOnRectangle(mouse, rectangle)) {
         return true;
     }
     return false;
@@ -189,6 +286,7 @@ ctx.font = "normal " + FONT_SIZE_STRING + " Black Ops One, cursive";
 ctx.textAlign = "center";
 ctx.textBaseline = "middle";
 const mouse = new Mouse();
+const starship = new Starship();
 let player;
 let listOfProjectiles;
 function init() {
@@ -202,6 +300,7 @@ let frame = 0;
 function animate() {
     frame = frame >= 60 ? 1 : frame + 1;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    starship.arrayOfRooms[starship.activeRoom.x][starship.activeRoom.y].update();
     player.update();
     listOfProjectiles.forEach((projectile, index) => {
         projectile.update();

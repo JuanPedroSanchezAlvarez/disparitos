@@ -1,0 +1,1 @@
+enum DOOR { UP, DOWN, LEFT, RIGHT };
