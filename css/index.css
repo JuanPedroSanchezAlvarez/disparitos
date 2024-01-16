@@ -10,11 +10,11 @@
 body, html {
     height: 100%;
     width: 100%;
-    background: black;
+    /* background: black; */
     overflow: hidden;
 }
 
 canvas {
-    background: url(../images/background/background.png);
+    background-image: url(../images/background/background.png);
     background-repeat: repeat;
 }
