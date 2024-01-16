@@ -11,14 +11,14 @@ class Projectile {
     }
 
     draw(): void {
-        ctx.beginPath();
         ctx.strokeStyle = LASER_COLOR;
         ctx.lineWidth = LASER_WIDTH;
         ctx.lineCap = "round";
+        ctx.beginPath();
         ctx.moveTo(this.positionFrom.x, this.positionFrom.y);
         ctx.lineTo(this.positionTo.x, this.positionTo.y);
-        ctx.stroke();
         ctx.closePath();
+        ctx.stroke();
     }
 
     update(): void {

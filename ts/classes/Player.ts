@@ -23,7 +23,8 @@ class Player {
         ctx.fillStyle = PLAYER_COLOR;
         ctx.arc(this.circle.position.x, this.circle.position.y, this.circle.radius, 0, Math.PI * 2, false);
         ctx.fill();
-        ctx.closePath();
+        //ctx.closePath();
+        // Note: When you call fill(), any open shapes are closed automatically, so you don't have to call closePath(). This is not the case when you call stroke().
     }
 
     update(): void {
@@ -32,6 +33,7 @@ class Player {
         if (this.isMovingDown) { this.circle.position.y += PLAYER_SPEED; }
         if (this.isMovingRight) { this.circle.position.x += PLAYER_SPEED; }
 
+        // Prevent player for getting out screen.
         if (this.circle.position.x - this.circle.radius < 0) {
             this.circle.position.x = 0 + this.circle.radius;
         } else if (this.circle.position.x + this.circle.radius > canvas.width) {
@@ -42,6 +44,13 @@ class Player {
         } else if (this.circle.position.y + this.circle.radius > canvas.height) {
             this.circle.position.y = canvas.height - this.circle.radius;
         }
+
+        // Check if player has collided with any door.
+        starship.getActiveRoom().listOfDoors.forEach((door) => {
+            if (hasCollidedCircleWithRectangle(this.circle, door.rectangle)) {
+                starship.changeActiveRoom(door.position);
+            }
+        });
 
         if (this.isShooting) {
             if (this.shootingFrame === 0 || this.shootingFrame % PLAYER_RATE_OF_FIRE_BLASTER === 0) {

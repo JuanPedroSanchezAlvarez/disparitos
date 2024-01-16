@@ -18,3 +18,7 @@ const LASER_LENGTH: number = 16;
 const LASER_WIDTH: number = 3;
 const LASER_SPEED: number = 20;
 const LASER_COLOR: string = "yellow";
+
+// DOOR
+const DOOR_WIDTH: number = 4;
+const DOOR_LARGE: number = 120;

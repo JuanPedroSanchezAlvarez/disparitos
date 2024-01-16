@@ -18,6 +18,33 @@ function hasCollidedRectangles(rectangle1: Rectangle, rectangle2: Rectangle): bo
     return true;
 }
 
+function hasCollidedCircleWithRectangle(circle: Circle, rectangle: Rectangle): boolean {
+    // Temporary variables to set edges for testing.
+    let testX: number = circle.position.x;
+    let testY: number = circle.position.y;
+
+    // Which edge is closest?
+    if (circle.position.x < rectangle.position.x) {
+        testX = rectangle.position.x; // Left edge.
+    } else if (circle.position.x > rectangle.position.x + rectangle.size.width) {
+        testX = rectangle.position.x + rectangle.size.width; // Right edge.
+    }
+    
+    if (circle.position.y < rectangle.position.y) {
+        testY = rectangle.position.y; // Top edge.
+    } else if (circle.position.y > rectangle.position.y + rectangle.size.height) {
+        testY = rectangle.position.y + rectangle.size.height; // Bottom edge.
+    }
+
+    // Get distance from closest edges.
+    let distX: number = circle.position.x - testX;
+    let distY: number = circle.position.y - testY;
+    let distance: number = Math.sqrt( (distX * distX) + (distY * distY) );
+
+    // If the distance is less than the radius, collision!
+    return distance <= circle.radius ? true : false;
+}
+
 function isFullCircleInsideAnotherCircle(innerCircle: Circle, outerCircle: Circle): boolean {
     return (getCirclesDistance(innerCircle, outerCircle) + innerCircle.radius <= outerCircle.radius) ? true : false;
 }

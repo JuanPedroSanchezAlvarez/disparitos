@@ -49,9 +49,7 @@ let listOfProjectiles: Projectile[];
 //let backgroundParticles: BackgroundParticle[] = []
 
 function init(): void {
-    const x: number = canvas.width / 2;
-    const y: number = canvas.height / 2;
-    player = new Player(new Circle(x, y, PLAYER_RADIUS));
+    player = new Player(new Circle(canvas.width / 2, canvas.height / 2, PLAYER_RADIUS));
     //powerUps = []
     listOfProjectiles = [];
     //enemies = []
@@ -175,7 +173,7 @@ function animate(): void {
         backgroundParticle.update()
     })*/
 
-    starship.arrayOfRooms[starship.activeRoom.x]![starship.activeRoom.y]!.update();
+    starship.update();
 
     player.update();
     

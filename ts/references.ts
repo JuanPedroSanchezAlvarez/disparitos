@@ -10,6 +10,7 @@
 
 /// <reference path="classes/Starship.ts"/>
 /// <reference path="classes/Room.ts"/>
+/// <reference path="classes/Door.ts"/>
 /// <reference path="classes/Player.ts"/>
 /// <reference path="classes/Projectile.ts"/>
 
