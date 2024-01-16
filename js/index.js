@@ -1,11 +1,11 @@
 "use strict";
-var DOOR;
-(function (DOOR) {
-    DOOR[DOOR["UP"] = 0] = "UP";
-    DOOR[DOOR["DOWN"] = 1] = "DOWN";
-    DOOR[DOOR["LEFT"] = 2] = "LEFT";
-    DOOR[DOOR["RIGHT"] = 3] = "RIGHT";
-})(DOOR || (DOOR = {}));
+var DOOR_POSITION;
+(function (DOOR_POSITION) {
+    DOOR_POSITION[DOOR_POSITION["UP"] = 0] = "UP";
+    DOOR_POSITION[DOOR_POSITION["DOWN"] = 1] = "DOWN";
+    DOOR_POSITION[DOOR_POSITION["LEFT"] = 2] = "LEFT";
+    DOOR_POSITION[DOOR_POSITION["RIGHT"] = 3] = "RIGHT";
+})(DOOR_POSITION || (DOOR_POSITION = {}));
 ;
 const WINDOW_WIDTH = 1920;
 const WINDOW_HEIGHT = 1080;
@@ -20,6 +20,8 @@ const LASER_LENGTH = 16;
 const LASER_WIDTH = 3;
 const LASER_SPEED = 20;
 const LASER_COLOR = "yellow";
+const DOOR_WIDTH = 4;
+const DOOR_LARGE = 120;
 class Position {
     constructor(x = 0, y = 0) {
         this.x = x;
@@ -57,83 +59,137 @@ class Starship {
             this.arrayOfRooms[x] = [];
             for (let y = 0; y < 3; y++) {
                 let listOfDoors = [];
-                listOfDoors.push(DOOR.UP);
-                listOfDoors.push(DOOR.DOWN);
-                listOfDoors.push(DOOR.LEFT);
-                listOfDoors.push(DOOR.RIGHT);
-                if (x == 0) {
-                    listOfDoors.forEach((door, index) => { if (door === DOOR.UP) {
-                        listOfDoors.splice(index, 1);
-                    } });
+                if (x === 0 && y === 0) {
+                    listOfDoors.push(DOOR_POSITION.DOWN);
+                    listOfDoors.push(DOOR_POSITION.RIGHT);
                 }
-                if (x == 2) {
-                    listOfDoors.forEach((door, index) => { if (door === DOOR.DOWN) {
-                        listOfDoors.splice(index, 1);
-                    } });
+                else if (x === 2 && y === 0) {
+                    listOfDoors.push(DOOR_POSITION.DOWN);
+                    listOfDoors.push(DOOR_POSITION.LEFT);
                 }
-                if (y == 0) {
-                    listOfDoors.forEach((door, index) => { if (door === DOOR.LEFT) {
-                        listOfDoors.splice(index, 1);
-                    } });
+                else if (x === 0 && y === 2) {
+                    listOfDoors.push(DOOR_POSITION.UP);
+                    listOfDoors.push(DOOR_POSITION.RIGHT);
                 }
-                if (y == 2) {
-                    listOfDoors.forEach((door, index) => { if (door === DOOR.RIGHT) {
-                        listOfDoors.splice(index, 1);
-                    } });
+                else if (x === 2 && y === 2) {
+                    listOfDoors.push(DOOR_POSITION.UP);
+                    listOfDoors.push(DOOR_POSITION.LEFT);
+                }
+                else if (x === 0) {
+                    listOfDoors.push(DOOR_POSITION.UP);
+                    listOfDoors.push(DOOR_POSITION.DOWN);
+                    listOfDoors.push(DOOR_POSITION.RIGHT);
+                }
+                else if (x === 2) {
+                    listOfDoors.push(DOOR_POSITION.UP);
+                    listOfDoors.push(DOOR_POSITION.DOWN);
+                    listOfDoors.push(DOOR_POSITION.LEFT);
+                }
+                else if (y === 0) {
+                    listOfDoors.push(DOOR_POSITION.DOWN);
+                    listOfDoors.push(DOOR_POSITION.LEFT);
+                    listOfDoors.push(DOOR_POSITION.RIGHT);
+                }
+                else if (y === 2) {
+                    listOfDoors.push(DOOR_POSITION.UP);
+                    listOfDoors.push(DOOR_POSITION.LEFT);
+                    listOfDoors.push(DOOR_POSITION.RIGHT);
+                }
+                else {
+                    listOfDoors.push(DOOR_POSITION.UP);
+                    listOfDoors.push(DOOR_POSITION.DOWN);
+                    listOfDoors.push(DOOR_POSITION.LEFT);
+                    listOfDoors.push(DOOR_POSITION.RIGHT);
                 }
                 this.arrayOfRooms[x][y] = new Room("Room " + x.toString() + y.toString(), listOfDoors);
             }
         }
         this.activeRoom = new Position(1, 1);
     }
+    getActiveRoom() {
+        return this.arrayOfRooms[this.activeRoom.x][this.activeRoom.y];
+    }
+    changeActiveRoom(doorPosition) {
+        switch (doorPosition) {
+            case DOOR_POSITION.UP: {
+                this.activeRoom.y -= 1;
+                break;
+            }
+            case DOOR_POSITION.DOWN: {
+                this.activeRoom.y += 1;
+                break;
+            }
+            case DOOR_POSITION.LEFT: {
+                this.activeRoom.x -= 1;
+                break;
+            }
+            case DOOR_POSITION.RIGHT: {
+                this.activeRoom.x += 1;
+                break;
+            }
+            default:
+                console.log("Error changing active room.");
+        }
+        player.circle.position.x = canvas.width / 2;
+        player.circle.position.y = canvas.height / 2;
+    }
     draw() {
     }
     update() {
+        this.getActiveRoom().update();
         this.draw();
     }
 }
 class Room {
-    constructor(name, listOfDoors) {
+    constructor(name, listOfDoorPosition) {
         this.name = name;
         this.rectangle = new Rectangle(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-        this.listOfDoors = listOfDoors;
+        this.listOfDoors = [];
+        listOfDoorPosition.forEach((position) => {
+            this.listOfDoors.push(new Door(position));
+        });
     }
     draw() {
-        this.listOfDoors.forEach((door) => {
-            ctx.beginPath();
-            ctx.strokeStyle = "red";
-            ctx.lineWidth = 10;
-            ctx.lineCap = "round";
-            switch (door) {
-                case DOOR.UP: {
-                    ctx.moveTo((WINDOW_WIDTH / 2) - 30, 0);
-                    ctx.lineTo((WINDOW_WIDTH / 2) + 30, 0);
-                    break;
-                }
-                case DOOR.DOWN: {
-                    ctx.moveTo((WINDOW_WIDTH / 2) - 30, WINDOW_HEIGHT);
-                    ctx.lineTo((WINDOW_WIDTH / 2) + 30, WINDOW_HEIGHT);
-                    break;
-                }
-                case DOOR.LEFT: {
-                    ctx.moveTo(0, (WINDOW_HEIGHT / 2) - 30);
-                    ctx.lineTo(0, (WINDOW_HEIGHT / 2) + 30);
-                    break;
-                }
-                case DOOR.RIGHT: {
-                    ctx.moveTo(WINDOW_WIDTH, (WINDOW_HEIGHT / 2) - 30);
-                    ctx.lineTo(WINDOW_WIDTH, (WINDOW_HEIGHT / 2) + 30);
-                    break;
-                }
-            }
-            ctx.stroke();
-            ctx.closePath();
-        });
         ctx.strokeStyle = "red";
         ctx.lineWidth = 4;
         ctx.strokeText(this.name, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
         ctx.fillStyle = "white";
         ctx.fillText(this.name, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
+    }
+    update() {
+        this.listOfDoors.forEach((door) => { door.update(); });
+        this.draw();
+    }
+}
+class Door {
+    constructor(position) {
+        this.color = "yellow";
+        this.position = position;
+        switch (this.position) {
+            case DOOR_POSITION.UP: {
+                this.rectangle = new Rectangle((WINDOW_WIDTH / 2) - (DOOR_LARGE / 2), 0, DOOR_LARGE, DOOR_WIDTH);
+                break;
+            }
+            case DOOR_POSITION.DOWN: {
+                this.rectangle = new Rectangle((WINDOW_WIDTH / 2) - (DOOR_LARGE / 2), WINDOW_HEIGHT - DOOR_WIDTH, DOOR_LARGE, DOOR_WIDTH);
+                break;
+            }
+            case DOOR_POSITION.LEFT: {
+                this.rectangle = new Rectangle(0, (WINDOW_HEIGHT / 2) - (DOOR_LARGE / 2), DOOR_WIDTH, DOOR_LARGE);
+                break;
+            }
+            case DOOR_POSITION.RIGHT: {
+                this.rectangle = new Rectangle(WINDOW_WIDTH - DOOR_WIDTH, (WINDOW_HEIGHT / 2) - (DOOR_LARGE / 2), DOOR_WIDTH, DOOR_LARGE);
+                break;
+            }
+            default:
+                this.rectangle = new Rectangle(0, 0, 0, 0);
+                console.log("Error creating door.");
+        }
+    }
+    draw() {
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.rectangle.position.x, this.rectangle.position.y, this.rectangle.size.width, this.rectangle.size.height);
     }
     update() {
         this.draw();
@@ -154,7 +210,6 @@ class Player {
         ctx.fillStyle = PLAYER_COLOR;
         ctx.arc(this.circle.position.x, this.circle.position.y, this.circle.radius, 0, Math.PI * 2, false);
         ctx.fill();
-        ctx.closePath();
     }
     update() {
         if (this.isMovingUp) {
@@ -181,6 +236,11 @@ class Player {
         else if (this.circle.position.y + this.circle.radius > canvas.height) {
             this.circle.position.y = canvas.height - this.circle.radius;
         }
+        starship.getActiveRoom().listOfDoors.forEach((door) => {
+            if (hasCollidedCircleWithRectangle(this.circle, door.rectangle)) {
+                starship.changeActiveRoom(door.position);
+            }
+        });
         if (this.isShooting) {
             if (this.shootingFrame === 0 || this.shootingFrame % PLAYER_RATE_OF_FIRE_BLASTER === 0) {
                 this.shoot(mouse);
@@ -212,14 +272,14 @@ class Projectile {
         this.velocity = velocity;
     }
     draw() {
-        ctx.beginPath();
         ctx.strokeStyle = LASER_COLOR;
         ctx.lineWidth = LASER_WIDTH;
         ctx.lineCap = "round";
+        ctx.beginPath();
         ctx.moveTo(this.positionFrom.x, this.positionFrom.y);
         ctx.lineTo(this.positionTo.x, this.positionTo.y);
-        ctx.stroke();
         ctx.closePath();
+        ctx.stroke();
     }
     update() {
         this.positionFrom.x = this.positionFrom.x + this.velocity.x;
@@ -244,6 +304,26 @@ function hasCollidedRectangles(rectangle1, rectangle2) {
         return false;
     }
     return true;
+}
+function hasCollidedCircleWithRectangle(circle, rectangle) {
+    let testX = circle.position.x;
+    let testY = circle.position.y;
+    if (circle.position.x < rectangle.position.x) {
+        testX = rectangle.position.x;
+    }
+    else if (circle.position.x > rectangle.position.x + rectangle.size.width) {
+        testX = rectangle.position.x + rectangle.size.width;
+    }
+    if (circle.position.y < rectangle.position.y) {
+        testY = rectangle.position.y;
+    }
+    else if (circle.position.y > rectangle.position.y + rectangle.size.height) {
+        testY = rectangle.position.y + rectangle.size.height;
+    }
+    let distX = circle.position.x - testX;
+    let distY = circle.position.y - testY;
+    let distance = Math.sqrt((distX * distX) + (distY * distY));
+    return distance <= circle.radius ? true : false;
 }
 function isFullCircleInsideAnotherCircle(innerCircle, outerCircle) {
     return (getCirclesDistance(innerCircle, outerCircle) + innerCircle.radius <= outerCircle.radius) ? true : false;
@@ -290,9 +370,7 @@ const starship = new Starship();
 let player;
 let listOfProjectiles;
 function init() {
-    const x = canvas.width / 2;
-    const y = canvas.height / 2;
-    player = new Player(new Circle(x, y, PLAYER_RADIUS));
+    player = new Player(new Circle(canvas.width / 2, canvas.height / 2, PLAYER_RADIUS));
     listOfProjectiles = [];
 }
 let animationId;
@@ -300,7 +378,7 @@ let frame = 0;
 function animate() {
     frame = frame >= 60 ? 1 : frame + 1;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    starship.arrayOfRooms[starship.activeRoom.x][starship.activeRoom.y].update();
+    starship.update();
     player.update();
     listOfProjectiles.forEach((projectile, index) => {
         projectile.update();
