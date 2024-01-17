@@ -1,4 +1,4 @@
-class Room {
+class Room implements Animated {
 
     name: string;
     rectangle: Rectangle;

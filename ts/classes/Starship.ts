@@ -1,4 +1,4 @@
-class Starship {
+class Starship implements Animated {
 
     arrayOfRooms: Room[][];
     activeRoom: Position;
@@ -57,25 +57,31 @@ class Starship {
         switch (doorPosition) {
             case DOOR_POSITION.UP: {
                 this.activeRoom.y -= 1;
+                player.circle.position.x = canvas.width / 2;
+                player.circle.position.y = canvas.height - player.circle.radius - 10;
                 break;
             }
             case DOOR_POSITION.DOWN: {
                 this.activeRoom.y += 1;
+                player.circle.position.x = canvas.width / 2;
+                player.circle.position.y = player.circle.radius + 10;
                 break;
             }
             case DOOR_POSITION.LEFT: {
                 this.activeRoom.x -= 1;
+                player.circle.position.x = canvas.width - player.circle.radius - 10;
+                player.circle.position.y = canvas.height / 2;
                 break;
             }
             case DOOR_POSITION.RIGHT: {
                 this.activeRoom.x += 1;
+                player.circle.position.x = player.circle.radius + 10;
+                player.circle.position.y = canvas.height / 2;
                 break;
             }
             default:
                 console.log("Error changing active room.");
         }
-        player.circle.position.x = canvas.width / 2;
-        player.circle.position.y = canvas.height / 2;
     }
 
     draw(): void {

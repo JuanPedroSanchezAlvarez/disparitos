@@ -1,4 +1,4 @@
-class Player {
+class Player implements Animated {
 
     circle: Circle;
     isMovingUp: boolean;

@@ -1,4 +1,4 @@
-class Door {
+class Door implements Animated {
 
     rectangle: Rectangle;
     position: DOOR_POSITION;

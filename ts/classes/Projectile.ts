@@ -1,4 +1,4 @@
-class Projectile {
+class Projectile implements Animated {
 
     positionFrom: Position;
     positionTo: Position;
