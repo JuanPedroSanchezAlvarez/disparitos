@@ -1,5 +1,9 @@
 class Player implements Animated {
 
+    static readonly RADIUS: number = 16;
+    static readonly COLOR: string = "white";
+    static readonly SPEED: number = 3;
+
     circle: Circle;
     isMovingUp: boolean;
     isMovingLeft: boolean;
@@ -20,7 +24,7 @@ class Player implements Animated {
 
     draw(): void {
         ctx.beginPath();
-        ctx.fillStyle = PLAYER_COLOR;
+        ctx.fillStyle = Player.COLOR;
         ctx.arc(this.circle.position.x, this.circle.position.y, this.circle.radius, 0, Math.PI * 2, false);
         ctx.fill();
         //ctx.closePath();
@@ -28,10 +32,10 @@ class Player implements Animated {
     }
 
     update(): void {
-        if (this.isMovingUp) { this.circle.position.y -= PLAYER_SPEED; }
-        if (this.isMovingLeft) { this.circle.position.x -= PLAYER_SPEED; }
-        if (this.isMovingDown) { this.circle.position.y += PLAYER_SPEED; }
-        if (this.isMovingRight) { this.circle.position.x += PLAYER_SPEED; }
+        if (this.isMovingUp) { this.circle.position.y -= Player.SPEED; }
+        if (this.isMovingLeft) { this.circle.position.x -= Player.SPEED; }
+        if (this.isMovingDown) { this.circle.position.y += Player.SPEED; }
+        if (this.isMovingRight) { this.circle.position.x += Player.SPEED; }
 
         // Prevent player for getting out screen.
         if (this.circle.position.x - this.circle.radius < 0) {

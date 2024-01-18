@@ -11,17 +11,12 @@ const WINDOW_WIDTH = 1920;
 const WINDOW_HEIGHT = 1080;
 const FONT_SIZE_STRING = "32px";
 const FONT_SIZE_NUMBER = 32;
-const PLAYER_RADIUS = 16;
-const PLAYER_COLOR = "white";
-const PLAYER_SPEED = 3;
 const PLAYER_RATE_OF_FIRE_PISTOL = 16;
 const PLAYER_RATE_OF_FIRE_BLASTER = 8;
 const LASER_LENGTH = 16;
 const LASER_WIDTH = 3;
 const LASER_SPEED = 20;
 const LASER_COLOR = "yellow";
-const DOOR_WIDTH = 4;
-const DOOR_LARGE = 120;
 class Position {
     constructor(x = 0, y = 0) {
         this.x = x;
@@ -173,19 +168,19 @@ class Door {
         this.position = position;
         switch (this.position) {
             case DOOR_POSITION.UP: {
-                this.rectangle = new Rectangle((WINDOW_WIDTH / 2) - (DOOR_LARGE / 2), 0, DOOR_LARGE, DOOR_WIDTH);
+                this.rectangle = new Rectangle((WINDOW_WIDTH / 2) - (Door.LARGE / 2), 0, Door.LARGE, Door.WIDTH);
                 break;
             }
             case DOOR_POSITION.DOWN: {
-                this.rectangle = new Rectangle((WINDOW_WIDTH / 2) - (DOOR_LARGE / 2), WINDOW_HEIGHT - DOOR_WIDTH, DOOR_LARGE, DOOR_WIDTH);
+                this.rectangle = new Rectangle((WINDOW_WIDTH / 2) - (Door.LARGE / 2), WINDOW_HEIGHT - Door.WIDTH, Door.LARGE, Door.WIDTH);
                 break;
             }
             case DOOR_POSITION.LEFT: {
-                this.rectangle = new Rectangle(0, (WINDOW_HEIGHT / 2) - (DOOR_LARGE / 2), DOOR_WIDTH, DOOR_LARGE);
+                this.rectangle = new Rectangle(0, (WINDOW_HEIGHT / 2) - (Door.LARGE / 2), Door.WIDTH, Door.LARGE);
                 break;
             }
             case DOOR_POSITION.RIGHT: {
-                this.rectangle = new Rectangle(WINDOW_WIDTH - DOOR_WIDTH, (WINDOW_HEIGHT / 2) - (DOOR_LARGE / 2), DOOR_WIDTH, DOOR_LARGE);
+                this.rectangle = new Rectangle(WINDOW_WIDTH - Door.WIDTH, (WINDOW_HEIGHT / 2) - (Door.LARGE / 2), Door.WIDTH, Door.LARGE);
                 break;
             }
             default:
@@ -201,6 +196,8 @@ class Door {
         this.draw();
     }
 }
+Door.WIDTH = 4;
+Door.LARGE = 120;
 class Player {
     constructor(circle) {
         this.circle = circle;
@@ -213,22 +210,22 @@ class Player {
     }
     draw() {
         ctx.beginPath();
-        ctx.fillStyle = PLAYER_COLOR;
+        ctx.fillStyle = Player.COLOR;
         ctx.arc(this.circle.position.x, this.circle.position.y, this.circle.radius, 0, Math.PI * 2, false);
         ctx.fill();
     }
     update() {
         if (this.isMovingUp) {
-            this.circle.position.y -= PLAYER_SPEED;
+            this.circle.position.y -= Player.SPEED;
         }
         if (this.isMovingLeft) {
-            this.circle.position.x -= PLAYER_SPEED;
+            this.circle.position.x -= Player.SPEED;
         }
         if (this.isMovingDown) {
-            this.circle.position.y += PLAYER_SPEED;
+            this.circle.position.y += Player.SPEED;
         }
         if (this.isMovingRight) {
-            this.circle.position.x += PLAYER_SPEED;
+            this.circle.position.x += Player.SPEED;
         }
         if (this.circle.position.x - this.circle.radius < 0) {
             this.circle.position.x = 0 + this.circle.radius;
@@ -271,6 +268,9 @@ class Player {
         listOfProjectiles.push(new Projectile(positionFrom, positionTo, velocity));
     }
 }
+Player.RADIUS = 16;
+Player.COLOR = "white";
+Player.SPEED = 3;
 class Projectile {
     constructor(positionFrom, positionTo, velocity) {
         this.positionFrom = positionFrom;
@@ -376,7 +376,7 @@ const starship = new Starship();
 let player;
 let listOfProjectiles;
 function init() {
-    player = new Player(new Circle(canvas.width / 2, canvas.height / 2, PLAYER_RADIUS));
+    player = new Player(new Circle(canvas.width / 2, canvas.height / 2, Player.RADIUS));
     listOfProjectiles = [];
 }
 let animationId;

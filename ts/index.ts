@@ -49,7 +49,7 @@ let listOfProjectiles: Projectile[];
 //let backgroundParticles: BackgroundParticle[] = []
 
 function init(): void {
-    player = new Player(new Circle(canvas.width / 2, canvas.height / 2, PLAYER_RADIUS));
+    player = new Player(new Circle(canvas.width / 2, canvas.height / 2, Player.RADIUS));
     //powerUps = []
     listOfProjectiles = [];
     //enemies = []
