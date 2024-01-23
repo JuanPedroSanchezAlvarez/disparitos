@@ -42,12 +42,24 @@ class Rectangle {
     }
 }
 class Mouse {
+    static getInstance() {
+        if (!Mouse.instance) {
+            Mouse.instance = new Mouse();
+        }
+        return Mouse.instance;
+    }
     constructor() {
         this.realPosition = new Position();
         this.scaledPosition = new Position();
     }
 }
 class Starship {
+    static getInstance() {
+        if (!Starship.instance) {
+            Starship.instance = new Starship();
+        }
+        return Starship.instance;
+    }
     constructor() {
         this.arrayOfRooms = [];
         for (let x = 0; x < 3; x++) {
@@ -99,33 +111,33 @@ class Starship {
                 this.arrayOfRooms[x][y] = new Room("Room " + x.toString() + y.toString(), listOfDoors);
             }
         }
-        this.activeRoom = new Position(1, 1);
+        this.activeRoomPosition = new Position(1, 1);
     }
     getActiveRoom() {
-        return this.arrayOfRooms[this.activeRoom.x][this.activeRoom.y];
+        return this.arrayOfRooms[this.activeRoomPosition.x][this.activeRoomPosition.y];
     }
     changeActiveRoom(doorPosition) {
         switch (doorPosition) {
             case DOOR_POSITION.UP: {
-                this.activeRoom.y -= 1;
+                this.activeRoomPosition.y -= 1;
                 player.circle.position.x = canvas.width / 2;
                 player.circle.position.y = canvas.height - player.circle.radius - 10;
                 break;
             }
             case DOOR_POSITION.DOWN: {
-                this.activeRoom.y += 1;
+                this.activeRoomPosition.y += 1;
                 player.circle.position.x = canvas.width / 2;
                 player.circle.position.y = player.circle.radius + 10;
                 break;
             }
             case DOOR_POSITION.LEFT: {
-                this.activeRoom.x -= 1;
+                this.activeRoomPosition.x -= 1;
                 player.circle.position.x = canvas.width - player.circle.radius - 10;
                 player.circle.position.y = canvas.height / 2;
                 break;
             }
             case DOOR_POSITION.RIGHT: {
-                this.activeRoom.x += 1;
+                this.activeRoomPosition.x += 1;
                 player.circle.position.x = player.circle.radius + 10;
                 player.circle.position.y = canvas.height / 2;
                 break;
@@ -199,8 +211,14 @@ class Door {
 Door.WIDTH = 4;
 Door.LARGE = 120;
 class Player {
-    constructor(circle) {
-        this.circle = circle;
+    static getInstance() {
+        if (!Player.instance) {
+            Player.instance = new Player();
+        }
+        return Player.instance;
+    }
+    constructor() {
+        this.circle = new Circle(canvas.width / 2, canvas.height / 2, Player.RADIUS);
         this.isMovingUp = false;
         this.isMovingLeft = false;
         this.isMovingDown = false;
@@ -362,7 +380,7 @@ function mouseOnCircleAndRectangle(mouse, rangeCircle, rectangle) {
     }
     return false;
 }
-const canvas = document.querySelector("canvas");
+const canvas = document.getElementById("canvasGame");
 const ctx = canvas.getContext("2d");
 canvas.width = WINDOW_WIDTH;
 canvas.height = WINDOW_HEIGHT;
@@ -371,12 +389,11 @@ canvas.style.height = "100vh";
 ctx.font = "normal " + FONT_SIZE_STRING + " Black Ops One, cursive";
 ctx.textAlign = "center";
 ctx.textBaseline = "middle";
-const mouse = new Mouse();
-const starship = new Starship();
-let player;
+const mouse = Mouse.getInstance();
+const starship = Starship.getInstance();
+const player = Player.getInstance();
 let listOfProjectiles;
 function init() {
-    player = new Player(new Circle(canvas.width / 2, canvas.height / 2, Player.RADIUS));
     listOfProjectiles = [];
 }
 let animationId;

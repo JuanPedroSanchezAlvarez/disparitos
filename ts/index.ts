@@ -1,6 +1,6 @@
 /// <reference path="references.ts"/>
 
-const canvas: HTMLCanvasElement = document.querySelector("canvas")!;
+const canvas: HTMLCanvasElement = document.getElementById("canvasGame") as HTMLCanvasElement;
 const ctx: CanvasRenderingContext2D = canvas.getContext("2d")!;
 // Tamaño de la resolución del juego.
 canvas.width = WINDOW_WIDTH;
@@ -37,11 +37,9 @@ powerUpImg.src = './images/lightning.png'
 const friction = 0.99
 */
 
-const mouse = new Mouse();
-
-const starship = new Starship();
-
-let player: Player;
+const mouse = Mouse.getInstance();
+const starship = Starship.getInstance();
+const player = Player.getInstance();
 //let powerUps: PowerUp[] = []
 let listOfProjectiles: Projectile[];
 //let enemies: Enemy[] = []
@@ -49,7 +47,6 @@ let listOfProjectiles: Projectile[];
 //let backgroundParticles: BackgroundParticle[] = []
 
 function init(): void {
-    player = new Player(new Circle(canvas.width / 2, canvas.height / 2, Player.RADIUS));
     //powerUps = []
     listOfProjectiles = [];
     //enemies = []

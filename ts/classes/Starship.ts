@@ -1,9 +1,17 @@
 class Starship implements Animated {
 
     arrayOfRooms: Room[][];
-    activeRoom: Position;
+    activeRoomPosition: Position;
 
-    constructor() {
+    // Singleton design pattern.
+    private static instance: Starship;
+
+    public static getInstance(): Starship {
+        if (!Starship.instance) { Starship.instance = new Starship(); }
+        return Starship.instance;
+    }
+
+    private constructor() {
         this.arrayOfRooms = [];
         for (let x: number = 0; x < 3; x++) {
             this.arrayOfRooms[x] = [];
@@ -46,35 +54,35 @@ class Starship implements Animated {
                 this.arrayOfRooms[x]![y] = new Room("Room " + x.toString() + y.toString(), listOfDoors);
             }
         }
-        this.activeRoom = new Position(1, 1);
+        this.activeRoomPosition = new Position(1, 1);
     }
 
     getActiveRoom(): Room {
-        return this.arrayOfRooms[this.activeRoom.x]![this.activeRoom.y]!;
+        return this.arrayOfRooms[this.activeRoomPosition.x]![this.activeRoomPosition.y]!;
     }
 
     changeActiveRoom(doorPosition: DOOR_POSITION): void {
         switch (doorPosition) {
             case DOOR_POSITION.UP: {
-                this.activeRoom.y -= 1;
+                this.activeRoomPosition.y -= 1;
                 player.circle.position.x = canvas.width / 2;
                 player.circle.position.y = canvas.height - player.circle.radius - 10;
                 break;
             }
             case DOOR_POSITION.DOWN: {
-                this.activeRoom.y += 1;
+                this.activeRoomPosition.y += 1;
                 player.circle.position.x = canvas.width / 2;
                 player.circle.position.y = player.circle.radius + 10;
                 break;
             }
             case DOOR_POSITION.LEFT: {
-                this.activeRoom.x -= 1;
+                this.activeRoomPosition.x -= 1;
                 player.circle.position.x = canvas.width - player.circle.radius - 10;
                 player.circle.position.y = canvas.height / 2;
                 break;
             }
             case DOOR_POSITION.RIGHT: {
-                this.activeRoom.x += 1;
+                this.activeRoomPosition.x += 1;
                 player.circle.position.x = player.circle.radius + 10;
                 player.circle.position.y = canvas.height / 2;
                 break;

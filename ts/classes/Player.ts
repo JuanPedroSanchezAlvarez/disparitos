@@ -12,8 +12,16 @@ class Player implements Animated {
     isShooting: boolean;
     shootingFrame: number;
 
-    constructor(circle: Circle) {
-        this.circle = circle;
+    // Singleton design pattern.
+    private static instance: Player;
+
+    public static getInstance(): Player {
+        if (!Player.instance) { Player.instance = new Player(); }
+        return Player.instance;
+    }
+
+    private constructor() {
+        this.circle = new Circle(canvas.width / 2, canvas.height / 2, Player.RADIUS);
         this.isMovingUp = false;
         this.isMovingLeft = false;
         this.isMovingDown = false;
