@@ -207,10 +207,10 @@ function animate(): void {
         projectile.update();
         // remove from edges of screen
         if (
-            projectile.positionFrom.x < 0 ||
-            projectile.positionFrom.x > canvas.width ||
-            projectile.positionFrom.y < 0 ||
-            projectile.positionFrom.y > canvas.height
+            projectile.getPosition().x < 0 ||
+            projectile.getPosition().x > canvas.width ||
+            projectile.getPosition().y < 0 ||
+            projectile.getPosition().y > canvas.height
         ) {
             setTimeout(() => {
                 listOfProjectiles.splice(index, 1)
@@ -321,7 +321,7 @@ function animate(): void {
     animationId = window.requestAnimationFrame(animate);
 }
 
-addEventListener("mousemove", ({ clientX, clientY }) => {
+document.addEventListener("mousemove", ({ clientX, clientY }) => {
     mouse.realPosition.x = clientX;
     mouse.realPosition.y = clientY;
     // Escalamos la posición real del click al tamaño de la pantalla del dispositivo.
@@ -329,11 +329,11 @@ addEventListener("mousemove", ({ clientX, clientY }) => {
     mouse.scaledPosition.y = clientY * (canvas.height / canvas.clientHeight);
 });
 
-addEventListener("mousedown", () => {
+document.addEventListener("mousedown", () => {
     player.isShooting = true;
 });
 
-addEventListener("mouseup", () => {
+document.addEventListener("mouseup", () => {
     player.isShooting = false;
 });
 
@@ -364,7 +364,7 @@ addEventListener('touchend', () => {
     player.shoot(mouse);
 });*/
 
-addEventListener("resize", () => {
+document.addEventListener("resize", () => {
     canvas.width = innerWidth;
     canvas.height = innerHeight;
     init();
@@ -392,14 +392,14 @@ addEventListener("resize", () => {
     })
 })*/
 
-addEventListener("keydown", ({ key }) => {
+document.addEventListener("keydown", ({ key }) => {
     if (key === "w") { player.isMovingUp = true; }
     if (key === "a") { player.isMovingLeft = true; }
     if (key === "s") { player.isMovingDown = true; }
     if (key === "d") { player.isMovingRight = true; }
 });
 
-addEventListener("keyup", ({ key }) => {
+document.addEventListener("keyup", ({ key }) => {
     if (key === "w") { player.isMovingUp = false; }
     if (key === "a") { player.isMovingLeft = false; }
     if (key === "s") { player.isMovingDown = false; }

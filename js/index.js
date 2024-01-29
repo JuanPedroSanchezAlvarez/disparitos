@@ -7,16 +7,17 @@ var DOOR_POSITION;
     DOOR_POSITION[DOOR_POSITION["RIGHT"] = 3] = "RIGHT";
 })(DOOR_POSITION || (DOOR_POSITION = {}));
 ;
+var PROJECTILE;
+(function (PROJECTILE) {
+    PROJECTILE[PROJECTILE["BLASTER_RIFLE"] = 0] = "BLASTER_RIFLE";
+})(PROJECTILE || (PROJECTILE = {}));
+;
 const WINDOW_WIDTH = 1920;
 const WINDOW_HEIGHT = 1080;
 const FONT_SIZE_STRING = "32px";
 const FONT_SIZE_NUMBER = 32;
 const PLAYER_RATE_OF_FIRE_PISTOL = 16;
 const PLAYER_RATE_OF_FIRE_BLASTER = 8;
-const LASER_LENGTH = 16;
-const LASER_WIDTH = 3;
-const LASER_SPEED = 20;
-const LASER_COLOR = "yellow";
 class Position {
     constructor(x = 0, y = 0) {
         this.x = x;
@@ -53,6 +54,83 @@ class Mouse {
         this.scaledPosition = new Position();
     }
 }
+class Velocity {
+    constructor(x = 0, y = 0) {
+        this.x = x;
+        this.y = y;
+    }
+}
+class Weapon {
+    constructor(name, precision, rateOfFire, magazineSize, maxNumberOfBullets, projectile) {
+        this.name = name;
+        this.precision = precision;
+        this.rateOfFire = rateOfFire;
+        this.magazineSize = magazineSize;
+        this.maxNumberOfBullets = maxNumberOfBullets;
+        this.projectile = projectile;
+    }
+}
+class BlasterRifle extends Weapon {
+    constructor() {
+        super(BlasterRifle.NAME, BlasterRifle.PRECISION, BlasterRifle.RATE_OF_FIRE, BlasterRifle.MAGAZINE_SIZE, BlasterRifle.MAX_NUMBER_OF_BULLETS, BlasterRifle.PROJECTILE);
+    }
+}
+BlasterRifle.NAME = "Blaster Rifle";
+BlasterRifle.PRECISION = 0.05;
+BlasterRifle.RATE_OF_FIRE = 8;
+BlasterRifle.MAGAZINE_SIZE = 30;
+BlasterRifle.MAX_NUMBER_OF_BULLETS = 300;
+BlasterRifle.PROJECTILE = PROJECTILE.BLASTER_RIFLE;
+class Projectile {
+    constructor(velocity) {
+        this.velocity = velocity;
+    }
+}
+class ProjectileLine extends Projectile {
+    constructor(positionStart, positionEnd, velocity) {
+        super(velocity);
+        this.positionStart = positionStart;
+        this.positionEnd = positionEnd;
+    }
+    getPosition() {
+        return this.positionStart;
+    }
+}
+class ProjectileCircle extends Projectile {
+    constructor(circle, velocity) {
+        super(velocity);
+        this.circle = circle;
+    }
+    getPosition() {
+        return this.circle.position;
+    }
+}
+class BlasterRifleProjectile extends ProjectileLine {
+    constructor(positionStart, positionEnd, velocity) {
+        super(positionStart, positionEnd, velocity);
+    }
+    draw() {
+        ctx.strokeStyle = BlasterRifleProjectile.COLOR;
+        ctx.lineWidth = BlasterRifleProjectile.WIDTH;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(this.positionStart.x, this.positionStart.y);
+        ctx.lineTo(this.positionEnd.x, this.positionEnd.y);
+        ctx.closePath();
+        ctx.stroke();
+    }
+    update() {
+        this.positionStart.x = this.positionStart.x + this.velocity.x;
+        this.positionStart.y = this.positionStart.y + this.velocity.y;
+        this.positionEnd.x = this.positionEnd.x + this.velocity.x;
+        this.positionEnd.y = this.positionEnd.y + this.velocity.y;
+        this.draw();
+    }
+}
+BlasterRifleProjectile.COLOR = "red";
+BlasterRifleProjectile.SPEED = 20;
+BlasterRifleProjectile.LENGTH = 16;
+BlasterRifleProjectile.WIDTH = 3;
 class Starship {
     static getInstance() {
         if (!Starship.instance) {
@@ -225,6 +303,11 @@ class Player {
         this.isMovingRight = false;
         this.isShooting = false;
         this.shootingFrame = 0;
+        this.tupleOfPrimaryWeapons = [new BlasterRifle(), new BlasterRifle(), new BlasterRifle()];
+        this.selectedPrimaryWeapon = 1;
+    }
+    getSelectedPrimaryWeapon() {
+        return this.tupleOfPrimaryWeapons[this.selectedPrimaryWeapon];
     }
     draw() {
         ctx.beginPath();
@@ -278,41 +361,16 @@ class Player {
     shoot(mouse) {
         const positionFrom = new Position(this.circle.position.x, this.circle.position.y);
         const angle = Math.atan2(mouse.scaledPosition.y - this.circle.position.y, mouse.scaledPosition.x - this.circle.position.x);
-        const modifier = (Math.random() / 10) - 0.05;
+        const modifier = (Math.random() / 10) - this.getSelectedPrimaryWeapon().precision;
         const angleModified = angle + modifier;
-        console.log(modifier);
-        const positionTo = new Position(positionFrom.x + (Math.cos(angleModified) * LASER_LENGTH), positionFrom.y + (Math.sin(angleModified) * LASER_LENGTH));
-        const velocity = { x: Math.cos(angleModified) * LASER_SPEED, y: Math.sin(angleModified) * LASER_SPEED };
-        listOfProjectiles.push(new Projectile(positionFrom, positionTo, velocity));
+        const positionTo = new Position(positionFrom.x + (Math.cos(angleModified) * BlasterRifleProjectile.LENGTH), positionFrom.y + (Math.sin(angleModified) * BlasterRifleProjectile.LENGTH));
+        const velocity = new Velocity(Math.cos(angleModified) * BlasterRifleProjectile.SPEED, Math.sin(angleModified) * BlasterRifleProjectile.SPEED);
+        listOfProjectiles.push(new BlasterRifleProjectile(positionFrom, positionTo, velocity));
     }
 }
 Player.RADIUS = 16;
 Player.COLOR = "white";
 Player.SPEED = 3;
-class Projectile {
-    constructor(positionFrom, positionTo, velocity) {
-        this.positionFrom = positionFrom;
-        this.positionTo = positionTo;
-        this.velocity = velocity;
-    }
-    draw() {
-        ctx.strokeStyle = LASER_COLOR;
-        ctx.lineWidth = LASER_WIDTH;
-        ctx.lineCap = "round";
-        ctx.beginPath();
-        ctx.moveTo(this.positionFrom.x, this.positionFrom.y);
-        ctx.lineTo(this.positionTo.x, this.positionTo.y);
-        ctx.closePath();
-        ctx.stroke();
-    }
-    update() {
-        this.positionFrom.x = this.positionFrom.x + this.velocity.x;
-        this.positionFrom.y = this.positionFrom.y + this.velocity.y;
-        this.positionTo.x = this.positionTo.x + this.velocity.x;
-        this.positionTo.y = this.positionTo.y + this.velocity.y;
-        this.draw();
-    }
-}
 function getCirclesDistance(circle1, circle2) {
     return Math.hypot(circle1.position.x - circle2.position.x, circle1.position.y - circle2.position.y);
 }
@@ -405,10 +463,10 @@ function animate() {
     player.update();
     listOfProjectiles.forEach((projectile, index) => {
         projectile.update();
-        if (projectile.positionFrom.x < 0 ||
-            projectile.positionFrom.x > canvas.width ||
-            projectile.positionFrom.y < 0 ||
-            projectile.positionFrom.y > canvas.height) {
+        if (projectile.getPosition().x < 0 ||
+            projectile.getPosition().x > canvas.width ||
+            projectile.getPosition().y < 0 ||
+            projectile.getPosition().y > canvas.height) {
             setTimeout(() => {
                 listOfProjectiles.splice(index, 1);
             }, 0);
@@ -416,24 +474,24 @@ function animate() {
     });
     animationId = window.requestAnimationFrame(animate);
 }
-addEventListener("mousemove", ({ clientX, clientY }) => {
+document.addEventListener("mousemove", ({ clientX, clientY }) => {
     mouse.realPosition.x = clientX;
     mouse.realPosition.y = clientY;
     mouse.scaledPosition.x = clientX * (canvas.width / canvas.clientWidth);
     mouse.scaledPosition.y = clientY * (canvas.height / canvas.clientHeight);
 });
-addEventListener("mousedown", () => {
+document.addEventListener("mousedown", () => {
     player.isShooting = true;
 });
-addEventListener("mouseup", () => {
+document.addEventListener("mouseup", () => {
     player.isShooting = false;
 });
-addEventListener("resize", () => {
+document.addEventListener("resize", () => {
     canvas.width = innerWidth;
     canvas.height = innerHeight;
     init();
 });
-addEventListener("keydown", ({ key }) => {
+document.addEventListener("keydown", ({ key }) => {
     if (key === "w") {
         player.isMovingUp = true;
     }
@@ -447,7 +505,7 @@ addEventListener("keydown", ({ key }) => {
         player.isMovingRight = true;
     }
 });
-addEventListener("keyup", ({ key }) => {
+document.addEventListener("keyup", ({ key }) => {
     if (key === "w") {
         player.isMovingUp = false;
     }

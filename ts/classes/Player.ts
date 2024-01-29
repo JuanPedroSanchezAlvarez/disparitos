@@ -1,8 +1,8 @@
 class Player implements Animated {
 
-    static readonly RADIUS: number = 16;
-    static readonly COLOR: string = "white";
-    static readonly SPEED: number = 3;
+    private static readonly RADIUS: number = 16;
+    private static readonly COLOR: string = "white";
+    private static readonly SPEED: number = 3;
 
     circle: Circle;
     isMovingUp: boolean;
@@ -11,6 +11,8 @@ class Player implements Animated {
     isMovingRight: boolean;
     isShooting: boolean;
     shootingFrame: number;
+    tupleOfPrimaryWeapons: [Weapon, Weapon, Weapon];
+    selectedPrimaryWeapon: number;
 
     // Singleton design pattern.
     private static instance: Player;
@@ -28,6 +30,12 @@ class Player implements Animated {
         this.isMovingRight = false;
         this.isShooting = false;
         this.shootingFrame = 0;
+        this.tupleOfPrimaryWeapons = [new BlasterRifle(), new BlasterRifle(), new BlasterRifle()];
+        this.selectedPrimaryWeapon = 1;
+    }
+
+    getSelectedPrimaryWeapon(): Weapon {
+        return this.tupleOfPrimaryWeapons[this.selectedPrimaryWeapon]!;
     }
 
     draw(): void {
@@ -81,13 +89,12 @@ class Player implements Animated {
     shoot(mouse: Mouse): void {
         const positionFrom: Position = new Position(this.circle.position.x, this.circle.position.y);
         const angle: number = Math.atan2(mouse.scaledPosition.y - this.circle.position.y, mouse.scaledPosition.x - this.circle.position.x);
-        // Math.random() generates a random number between 0 and 1. Modified to generate it between -0.05 and 0.05.
-        const modifier: number = (Math.random() / 10) - 0.05;
+        // Math.random() generates a random number between 0 and 1. Modified to generate it between +/- weapon precision.
+        const modifier: number = (Math.random() / 10) - this.getSelectedPrimaryWeapon().precision;
         const angleModified: number = angle + modifier;
-        console.log(modifier);
-        const positionTo: Position = new Position(positionFrom.x + (Math.cos(angleModified) * LASER_LENGTH), positionFrom.y + (Math.sin(angleModified) * LASER_LENGTH));
-        const velocity = { x: Math.cos(angleModified) * LASER_SPEED, y: Math.sin(angleModified) * LASER_SPEED };
-        listOfProjectiles.push(new Projectile(positionFrom, positionTo, velocity));
+        const positionTo: Position = new Position(positionFrom.x + (Math.cos(angleModified) * BlasterRifleProjectile.LENGTH), positionFrom.y + (Math.sin(angleModified) * BlasterRifleProjectile.LENGTH));
+        const velocity = new Velocity(Math.cos(angleModified) * BlasterRifleProjectile.SPEED, Math.sin(angleModified) * BlasterRifleProjectile.SPEED);
+        listOfProjectiles.push(new BlasterRifleProjectile(positionFrom, positionTo, velocity));
         //shootAudio.play();
     }
 

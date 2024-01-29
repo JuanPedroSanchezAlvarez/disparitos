@@ -1,7 +1,7 @@
 class Door implements Animated {
 
-    static readonly WIDTH: number = 4;
-    static readonly LARGE: number = 120;
+    private static readonly WIDTH: number = 4;
+    private static readonly LARGE: number = 120;
 
     rectangle: Rectangle;
     position: DOOR_POSITION;
