@@ -11,7 +11,7 @@ class Player implements Animated {
     isMovingRight: boolean;
     isShooting: boolean;
     shootingFrame: number;
-    tupleOfPrimaryWeapons: [Weapon, Weapon, Weapon];
+    tupleOfPrimaryWeapons: [BlasterPistol, BlasterRifle, Weapon];
     selectedPrimaryWeapon: number;
 
     // Singleton design pattern.
@@ -30,7 +30,7 @@ class Player implements Animated {
         this.isMovingRight = false;
         this.isShooting = false;
         this.shootingFrame = 0;
-        this.tupleOfPrimaryWeapons = [new BlasterRifle(), new BlasterRifle(), new BlasterRifle()];
+        this.tupleOfPrimaryWeapons = [new BlasterPistol(), new BlasterRifle(), new FlechetteWeapon()];
         this.selectedPrimaryWeapon = 1;
     }
 
@@ -73,7 +73,7 @@ class Player implements Animated {
         });
 
         if (this.isShooting) {
-            if (this.shootingFrame === 0 || this.shootingFrame % PLAYER_RATE_OF_FIRE_BLASTER === 0) {
+            if (this.shootingFrame === 0 || this.shootingFrame % this.getSelectedPrimaryWeapon().rateOfFire === 0) {
                 this.shoot(mouse);
             }
             this.shootingFrame++;
@@ -87,14 +87,26 @@ class Player implements Animated {
     }
 
     shoot(mouse: Mouse): void {
+        const projectile: Projectile = this.getSelectedPrimaryWeapon().createProjectile();
+
         const positionFrom: Position = new Position(this.circle.position.x, this.circle.position.y);
         const angle: number = Math.atan2(mouse.scaledPosition.y - this.circle.position.y, mouse.scaledPosition.x - this.circle.position.x);
-        // Math.random() generates a random number between 0 and 1. Modified to generate it between +/- weapon precision.
-        const modifier: number = (Math.random() / 10) - this.getSelectedPrimaryWeapon().precision;
+        const modifier: number = (Math.random() / 10) - this.getSelectedPrimaryWeapon().precision; // Math.random() generates a random number between 0 and 1. Modified to generate it between +/- weapon precision.
         const angleModified: number = angle + modifier;
-        const positionTo: Position = new Position(positionFrom.x + (Math.cos(angleModified) * BlasterRifleProjectile.LENGTH), positionFrom.y + (Math.sin(angleModified) * BlasterRifleProjectile.LENGTH));
-        const velocity = new Velocity(Math.cos(angleModified) * BlasterRifleProjectile.SPEED, Math.sin(angleModified) * BlasterRifleProjectile.SPEED);
-        listOfProjectiles.push(new BlasterRifleProjectile(positionFrom, positionTo, velocity));
+        const velocity = new Velocity(Math.cos(angleModified) * projectile.speed, Math.sin(angleModified) * projectile.speed);
+        projectile.velocity = velocity;
+
+        if (projectile instanceof ProjectileLine) {
+            const positionTo: Position = new Position(positionFrom.x + (Math.cos(angleModified) * projectile.length), positionFrom.y + (Math.sin(angleModified) * projectile.length));
+            projectile.positionStart = positionFrom;
+            projectile.positionEnd = positionTo;
+        } else if (projectile instanceof ProjectileCircle) {
+            projectile.circle.position = positionFrom;
+        } else {
+            console.error("Error: Projectile must be Line or Circle.");
+        }
+        
+        listOfProjectiles.push(projectile);
         //shootAudio.play();
     }
 

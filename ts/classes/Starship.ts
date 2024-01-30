@@ -88,7 +88,7 @@ class Starship implements Animated {
                 break;
             }
             default:
-                console.log("Error changing active room.");
+                console.error("Error changing active room.");
         }
     }
 

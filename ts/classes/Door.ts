@@ -28,7 +28,7 @@ class Door implements Animated {
             }
             default:
                 this.rectangle = new Rectangle(0, 0, 0, 0);
-                console.log("Error creating door.");
+                console.error("Error creating door.");
         }
     }
 

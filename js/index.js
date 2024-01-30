@@ -7,17 +7,10 @@ var DOOR_POSITION;
     DOOR_POSITION[DOOR_POSITION["RIGHT"] = 3] = "RIGHT";
 })(DOOR_POSITION || (DOOR_POSITION = {}));
 ;
-var PROJECTILE;
-(function (PROJECTILE) {
-    PROJECTILE[PROJECTILE["BLASTER_RIFLE"] = 0] = "BLASTER_RIFLE";
-})(PROJECTILE || (PROJECTILE = {}));
-;
 const WINDOW_WIDTH = 1920;
 const WINDOW_HEIGHT = 1080;
 const FONT_SIZE_STRING = "32px";
 const FONT_SIZE_NUMBER = 32;
-const PLAYER_RATE_OF_FIRE_PISTOL = 16;
-const PLAYER_RATE_OF_FIRE_BLASTER = 8;
 class Position {
     constructor(x = 0, y = 0) {
         this.x = x;
@@ -61,57 +54,114 @@ class Velocity {
     }
 }
 class Weapon {
-    constructor(name, precision, rateOfFire, magazineSize, maxNumberOfBullets, projectile) {
+    constructor(name, precision, rateOfFire, maxMagazineSize, maxNumberOfBullets) {
         this.name = name;
         this.precision = precision;
         this.rateOfFire = rateOfFire;
-        this.magazineSize = magazineSize;
+        this.magazineSize = 0;
+        this.maxMagazineSize = maxMagazineSize;
         this.maxNumberOfBullets = maxNumberOfBullets;
-        this.projectile = projectile;
     }
 }
+class BlasterPistol extends Weapon {
+    constructor() {
+        super(BlasterPistol.NAME, BlasterPistol.PRECISION, BlasterPistol.RATE_OF_FIRE, BlasterPistol.MAX_MAGAZINE_SIZE, BlasterPistol.MAX_NUMBER_OF_BULLETS);
+    }
+    createProjectile() {
+        return new BlasterPistolProjectile({ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 });
+    }
+}
+BlasterPistol.NAME = "Blaster Pistol";
+BlasterPistol.PRECISION = 0.05;
+BlasterPistol.RATE_OF_FIRE = 16;
+BlasterPistol.MAX_MAGAZINE_SIZE = 30;
+BlasterPistol.MAX_NUMBER_OF_BULLETS = 300;
 class BlasterRifle extends Weapon {
     constructor() {
-        super(BlasterRifle.NAME, BlasterRifle.PRECISION, BlasterRifle.RATE_OF_FIRE, BlasterRifle.MAGAZINE_SIZE, BlasterRifle.MAX_NUMBER_OF_BULLETS, BlasterRifle.PROJECTILE);
+        super(BlasterRifle.NAME, BlasterRifle.PRECISION, BlasterRifle.RATE_OF_FIRE, BlasterRifle.MAX_MAGAZINE_SIZE, BlasterRifle.MAX_NUMBER_OF_BULLETS);
+    }
+    createProjectile() {
+        return new BlasterRifleProjectile({ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 });
     }
 }
 BlasterRifle.NAME = "Blaster Rifle";
 BlasterRifle.PRECISION = 0.05;
 BlasterRifle.RATE_OF_FIRE = 8;
-BlasterRifle.MAGAZINE_SIZE = 30;
+BlasterRifle.MAX_MAGAZINE_SIZE = 30;
 BlasterRifle.MAX_NUMBER_OF_BULLETS = 300;
-BlasterRifle.PROJECTILE = PROJECTILE.BLASTER_RIFLE;
+class FlechetteWeapon extends Weapon {
+    constructor() {
+        super(FlechetteWeapon.NAME, FlechetteWeapon.PRECISION, FlechetteWeapon.RATE_OF_FIRE, FlechetteWeapon.MAX_MAGAZINE_SIZE, FlechetteWeapon.MAX_NUMBER_OF_BULLETS);
+    }
+    createProjectile() {
+        return new FlechetteWeaponProjectile({ x: 0, y: 0 }, { x: 0, y: 0 });
+    }
+}
+FlechetteWeapon.NAME = "Flechette Weapon";
+FlechetteWeapon.PRECISION = 0.05;
+FlechetteWeapon.RATE_OF_FIRE = 8;
+FlechetteWeapon.MAX_MAGAZINE_SIZE = 30;
+FlechetteWeapon.MAX_NUMBER_OF_BULLETS = 300;
+class HeavyRepeater extends Weapon {
+    constructor() {
+        super(HeavyRepeater.NAME, HeavyRepeater.PRECISION, HeavyRepeater.RATE_OF_FIRE, HeavyRepeater.MAX_MAGAZINE_SIZE, HeavyRepeater.MAX_NUMBER_OF_BULLETS);
+    }
+    createProjectile() {
+        return new HeavyRepeaterProjectile({ x: 0, y: 0 }, { x: 0, y: 0 });
+    }
+}
+HeavyRepeater.NAME = "Heavy Repeater";
+HeavyRepeater.PRECISION = 0.05;
+HeavyRepeater.RATE_OF_FIRE = 8;
+HeavyRepeater.MAX_MAGAZINE_SIZE = 30;
+HeavyRepeater.MAX_NUMBER_OF_BULLETS = 300;
+class PortableMissileSystem extends Weapon {
+    constructor() {
+        super(PortableMissileSystem.NAME, PortableMissileSystem.PRECISION, PortableMissileSystem.RATE_OF_FIRE, PortableMissileSystem.MAX_MAGAZINE_SIZE, PortableMissileSystem.MAX_NUMBER_OF_BULLETS);
+    }
+    createProjectile() {
+        return new PortableMissileSystemProjectile({ x: 0, y: 0 }, { x: 0, y: 0 });
+    }
+}
+PortableMissileSystem.NAME = "Portable Missile System";
+PortableMissileSystem.PRECISION = 0.05;
+PortableMissileSystem.RATE_OF_FIRE = 8;
+PortableMissileSystem.MAX_MAGAZINE_SIZE = 30;
+PortableMissileSystem.MAX_NUMBER_OF_BULLETS = 300;
+class WookieBowcaster extends Weapon {
+    constructor() {
+        super(WookieBowcaster.NAME, WookieBowcaster.PRECISION, WookieBowcaster.RATE_OF_FIRE, WookieBowcaster.MAX_MAGAZINE_SIZE, WookieBowcaster.MAX_NUMBER_OF_BULLETS);
+    }
+    createProjectile() {
+        return new WookieBowcasterProjectile({ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 });
+    }
+}
+WookieBowcaster.NAME = "Wookie Bowcaster";
+WookieBowcaster.PRECISION = 0.05;
+WookieBowcaster.RATE_OF_FIRE = 8;
+WookieBowcaster.MAX_MAGAZINE_SIZE = 30;
+WookieBowcaster.MAX_NUMBER_OF_BULLETS = 300;
 class Projectile {
-    constructor(velocity) {
+    constructor(color, speed, velocity) {
+        this.color = color;
+        this.speed = speed;
         this.velocity = velocity;
     }
 }
 class ProjectileLine extends Projectile {
-    constructor(positionStart, positionEnd, velocity) {
-        super(velocity);
+    constructor(positionStart, positionEnd, length, width, color, speed, velocity) {
+        super(color, speed, velocity);
+        this.length = length;
+        this.width = width;
         this.positionStart = positionStart;
         this.positionEnd = positionEnd;
     }
     getPosition() {
         return this.positionStart;
     }
-}
-class ProjectileCircle extends Projectile {
-    constructor(circle, velocity) {
-        super(velocity);
-        this.circle = circle;
-    }
-    getPosition() {
-        return this.circle.position;
-    }
-}
-class BlasterRifleProjectile extends ProjectileLine {
-    constructor(positionStart, positionEnd, velocity) {
-        super(positionStart, positionEnd, velocity);
-    }
     draw() {
-        ctx.strokeStyle = BlasterRifleProjectile.COLOR;
-        ctx.lineWidth = BlasterRifleProjectile.WIDTH;
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = this.width;
         ctx.lineCap = "round";
         ctx.beginPath();
         ctx.moveTo(this.positionStart.x, this.positionStart.y);
@@ -120,17 +170,84 @@ class BlasterRifleProjectile extends ProjectileLine {
         ctx.stroke();
     }
     update() {
-        this.positionStart.x = this.positionStart.x + this.velocity.x;
-        this.positionStart.y = this.positionStart.y + this.velocity.y;
-        this.positionEnd.x = this.positionEnd.x + this.velocity.x;
-        this.positionEnd.y = this.positionEnd.y + this.velocity.y;
+        this.positionStart.x += this.velocity.x;
+        this.positionStart.y += this.velocity.y;
+        this.positionEnd.x += this.velocity.x;
+        this.positionEnd.y += this.velocity.y;
         this.draw();
+    }
+}
+class ProjectileCircle extends Projectile {
+    constructor(circle, color, speed, velocity) {
+        super(color, speed, velocity);
+        this.circle = circle;
+    }
+    getPosition() {
+        return this.circle.position;
+    }
+    draw() {
+        ctx.beginPath();
+        ctx.fillStyle = this.color;
+        ctx.arc(this.circle.position.x, this.circle.position.y, this.circle.radius, 0, Math.PI * 2, false);
+        ctx.fill();
+    }
+    update() {
+        this.circle.position.x += this.velocity.x;
+        this.circle.position.y += this.velocity.y;
+        this.draw();
+    }
+}
+class BlasterPistolProjectile extends ProjectileLine {
+    constructor(positionStart, positionEnd, velocity) {
+        super(positionStart, positionEnd, BlasterPistolProjectile.LENGTH, BlasterPistolProjectile.WIDTH, BlasterPistolProjectile.COLOR, BlasterPistolProjectile.SPEED, velocity);
+    }
+}
+BlasterPistolProjectile.COLOR = "yellow";
+BlasterPistolProjectile.SPEED = 20;
+BlasterPistolProjectile.LENGTH = 16;
+BlasterPistolProjectile.WIDTH = 3;
+class BlasterRifleProjectile extends ProjectileLine {
+    constructor(positionStart, positionEnd, velocity) {
+        super(positionStart, positionEnd, BlasterRifleProjectile.LENGTH, BlasterRifleProjectile.WIDTH, BlasterRifleProjectile.COLOR, BlasterRifleProjectile.SPEED, velocity);
     }
 }
 BlasterRifleProjectile.COLOR = "red";
 BlasterRifleProjectile.SPEED = 20;
 BlasterRifleProjectile.LENGTH = 16;
 BlasterRifleProjectile.WIDTH = 3;
+class FlechetteWeaponProjectile extends ProjectileCircle {
+    constructor(position, velocity) {
+        super(new Circle(position.x, position.y, FlechetteWeaponProjectile.SIZE), FlechetteWeaponProjectile.COLOR, FlechetteWeaponProjectile.SPEED, velocity);
+    }
+}
+FlechetteWeaponProjectile.COLOR = "orange";
+FlechetteWeaponProjectile.SPEED = 20;
+FlechetteWeaponProjectile.SIZE = 8;
+class HeavyRepeaterProjectile extends ProjectileCircle {
+    constructor(position, velocity) {
+        super(new Circle(position.x, position.y, HeavyRepeaterProjectile.SIZE), HeavyRepeaterProjectile.COLOR, HeavyRepeaterProjectile.SPEED, velocity);
+    }
+}
+HeavyRepeaterProjectile.COLOR = "orange";
+HeavyRepeaterProjectile.SPEED = 20;
+HeavyRepeaterProjectile.SIZE = 8;
+class PortableMissileSystemProjectile extends ProjectileCircle {
+    constructor(position, velocity) {
+        super(new Circle(position.x, position.y, PortableMissileSystemProjectile.SIZE), PortableMissileSystemProjectile.COLOR, PortableMissileSystemProjectile.SPEED, velocity);
+    }
+}
+PortableMissileSystemProjectile.COLOR = "orange";
+PortableMissileSystemProjectile.SPEED = 20;
+PortableMissileSystemProjectile.SIZE = 8;
+class WookieBowcasterProjectile extends ProjectileLine {
+    constructor(positionStart, positionEnd, velocity) {
+        super(positionStart, positionEnd, WookieBowcasterProjectile.LENGTH, WookieBowcasterProjectile.WIDTH, WookieBowcasterProjectile.COLOR, WookieBowcasterProjectile.SPEED, velocity);
+    }
+}
+WookieBowcasterProjectile.COLOR = "green";
+WookieBowcasterProjectile.SPEED = 20;
+WookieBowcasterProjectile.LENGTH = 16;
+WookieBowcasterProjectile.WIDTH = 3;
 class Starship {
     static getInstance() {
         if (!Starship.instance) {
@@ -221,7 +338,7 @@ class Starship {
                 break;
             }
             default:
-                console.log("Error changing active room.");
+                console.error("Error changing active room.");
         }
     }
     draw() {
@@ -275,7 +392,7 @@ class Door {
             }
             default:
                 this.rectangle = new Rectangle(0, 0, 0, 0);
-                console.log("Error creating door.");
+                console.error("Error creating door.");
         }
     }
     draw() {
@@ -303,8 +420,8 @@ class Player {
         this.isMovingRight = false;
         this.isShooting = false;
         this.shootingFrame = 0;
-        this.tupleOfPrimaryWeapons = [new BlasterRifle(), new BlasterRifle(), new BlasterRifle()];
-        this.selectedPrimaryWeapon = 1;
+        this.tupleOfPrimaryWeapons = [new BlasterPistol(), new BlasterRifle(), new FlechetteWeapon()];
+        this.selectedPrimaryWeapon = 2;
     }
     getSelectedPrimaryWeapon() {
         return this.tupleOfPrimaryWeapons[this.selectedPrimaryWeapon];
@@ -346,7 +463,7 @@ class Player {
             }
         });
         if (this.isShooting) {
-            if (this.shootingFrame === 0 || this.shootingFrame % PLAYER_RATE_OF_FIRE_BLASTER === 0) {
+            if (this.shootingFrame === 0 || this.shootingFrame % this.getSelectedPrimaryWeapon().rateOfFire === 0) {
                 this.shoot(mouse);
             }
             this.shootingFrame++;
@@ -359,13 +476,25 @@ class Player {
         this.draw();
     }
     shoot(mouse) {
+        const projectile = this.getSelectedPrimaryWeapon().createProjectile();
         const positionFrom = new Position(this.circle.position.x, this.circle.position.y);
         const angle = Math.atan2(mouse.scaledPosition.y - this.circle.position.y, mouse.scaledPosition.x - this.circle.position.x);
         const modifier = (Math.random() / 10) - this.getSelectedPrimaryWeapon().precision;
         const angleModified = angle + modifier;
-        const positionTo = new Position(positionFrom.x + (Math.cos(angleModified) * BlasterRifleProjectile.LENGTH), positionFrom.y + (Math.sin(angleModified) * BlasterRifleProjectile.LENGTH));
-        const velocity = new Velocity(Math.cos(angleModified) * BlasterRifleProjectile.SPEED, Math.sin(angleModified) * BlasterRifleProjectile.SPEED);
-        listOfProjectiles.push(new BlasterRifleProjectile(positionFrom, positionTo, velocity));
+        const velocity = new Velocity(Math.cos(angleModified) * projectile.speed, Math.sin(angleModified) * projectile.speed);
+        projectile.velocity = velocity;
+        if (projectile instanceof ProjectileLine) {
+            const positionTo = new Position(positionFrom.x + (Math.cos(angleModified) * projectile.length), positionFrom.y + (Math.sin(angleModified) * projectile.length));
+            projectile.positionStart = positionFrom;
+            projectile.positionEnd = positionTo;
+        }
+        else if (projectile instanceof ProjectileCircle) {
+            projectile.circle.position = positionFrom;
+        }
+        else {
+            console.error("Error: Projectile must be Line or Circle.");
+        }
+        listOfProjectiles.push(projectile);
     }
 }
 Player.RADIUS = 16;
